@@ -107,7 +107,8 @@ class StudentInfoController extends Controller
                 'emergency_relationship' => 'required|string',
                 'emergency_phone' => 'required|string',
                 'emergency_address' => 'required|string',
-                'password' => 'required|string|min:6|confirmed'
+                'password' => 'required|string|min:6|confirmed',
+                 'password' => 'required|string|min:6|confirmed',
 
             ]);
 
