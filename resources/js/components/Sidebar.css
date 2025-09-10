@@ -1,0 +1,44 @@
+/* Default sidebar - hidden off screen */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background-color: #212529;
+  position: fixed;
+  top: 0;
+  left: -220px;
+  transition: left 0.3s ease;
+  z-index: 1040;
+}
+
+/* Show sidebar when open */
+.sidebar.show {
+  left: 0;
+}
+
+/* Always show on desktop */
+@media (min-width: 768px) {
+  .sidebar {
+    left: 0;
+  }
+
+  .content-with-sidebar {
+    margin-left: 220px;
+  }
+
+  .top-navbar {
+    display: none;
+  }
+}
+
+/* Top navbar for mobile */
+.top-navbar {
+  position: sticky;
+  top: 0;
+  background-color: #212529;
+  color: white;
+  padding: 10px;
+  z-index: 1050;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
