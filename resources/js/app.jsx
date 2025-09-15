@@ -3,31 +3,32 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import Login from './components/Login';
-import AdminDashboard from './components/Admin/AdminDashboard';
-import TeacherHome from './components/TeacherHome';
-import StudentHome from './components/StudentHome';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import TeacherHome from './pages/Teacher/TeacherHome';
+import StudentHome from './pages/Students/StudentHome';
 import ResetPassword from './components/ResetPassword';
-import AdviserHome from './components/AdviserHome';
+import AdviserHome from './pages/Adviser/AdviserHome';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './components/AdminLayout';
-import SectionManagement from './components/Admin/SectionManagement';
-import ClassSchedule from './components/Admin/ClassSchedule';
-import GradeManagement from './components/Admin/GradeManagement';
-import ViolationManagement from './components/Admin/ViolationManagement';
-import DocumentRequests from './components/Admin/DocumentRequests';
-import AdviserManageSection from './components/AdviserManageSection';
-import ManageSection from './components/Admin/ManageSection';
+import SectionManagement from './pages/Admin/SectionManagement';
+import ClassSchedule from './pages/Admin/ClassSchedule';
+import GradeManagement from './pages/Admin/GradeManagement';
+import ViolationManagement from './pages/Admin/ViolationManagement';
+import DocumentRequests from './pages/Admin/DocumentRequests';
+import AdviserManageSection from './pages/Adviser/AdviserManageSection';
+import ManageSection from './pages/Admin/ManageSection';
 import StudentInfo from './components/StudentInfo';
 import AdviserTeacherInfo from './components/TeacherAdviserInfo';
-import AdminScheduleManagement from './components//Admin/AdminScheduleManagement'; // or correct path
-import ViewSchedule from './components/Admin/ViewSchedule'; // or correct path
+import AdminScheduleManagement from './pages/Admin/AdminScheduleManagement'; // or correct path
+import ViewSchedule from './pages/Admin/ViewSchedule'; // or correct path
 
-import MySchedule from './components/MySchedule'; // adjust the path if needed
-import AdviserMySchedule  from './components/AdviserMySchedule';
-import StudentSchedule  from './components/StudentSchedule';
-import MyViolations  from './components/MyViolations';
-import StudentDocuments from './components/StudentDocuments';
-import AdviserSection from './components/AdviserSections';
+import MySchedule from './pages/Teacher/MySchedule'; // adjust the path if needed
+import AdviserMySchedule  from './pages/Adviser/AdviserMySchedule';
+import StudentSchedule  from './pages/Students/StudentSchedule';
+import MyViolations  from './pages/Students/MyViolations';
+import StudentDocuments from './pages/Students/StudentDocuments';
+import AdviserSection from './pages/Adviser/AdviserSections';
+import StudentGrades from './pages/Students/StudentGrades';
 
 // Attach token on reload
 const token = localStorage.getItem('token');
@@ -153,6 +154,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 <Route path="/student/documents" element={<StudentDocuments />} />
 <Route path="/adviser/MySection" element={<AdviserSection />} />
+<Route path="/student/grades" element={<StudentGrades />} />
     </Routes>
 
 

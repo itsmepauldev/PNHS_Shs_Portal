@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import TeacherLayout from './TeacherLayout';
+import TeacherLayout from '../../components/TeacherLayout';
 
 export default function TeacherHome() {
   const navigate = useNavigate();
@@ -64,13 +64,13 @@ export default function TeacherHome() {
 
   return (
     <TeacherLayout>
-    <div className="container-fluid ">
-
-      <h2 className="mb-3">Welcome, {user?.name || 'Teacher'}!</h2>
+       <div style={{ backgroundColor: "#f3f3f3", minHeight: "100vh" }}>
+        <div className="container-fluid p-3" style={{ backgroundColor: "#f3f3f3" }}>
+      <h2 className="mb-3 fw-bold text-danger">Welcome, {user?.name || 'Teacher'}!</h2>
       <p className="lead text-muted">This is your Teacher dashboard.</p>
 
       <div className="mt-4">
-        <h4 className="mb-3">Assigned Subjects</h4>
+        <h4 className="mb-3 fw-bold text-danger">Assigned Subjects</h4>
 
         {loadingSubjects ? (
           <div className="text-center py-5">
@@ -90,12 +90,9 @@ export default function TeacherHome() {
                       <strong>Grade:</strong> {item.section.grade_level} <br />
                       <strong>Strand:</strong> {item.section.strand}
                     </p>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => navigate(`/teacher/section/${item.section.id}/subject/${item.subject}`)}
-                    >
-                      Manage Grades
-                    </button>
+                   <button className="btn btn-secondary" disabled>
+                    Manage Grades (Coming Soon)
+                  </button>
                   </div>
                 </div>
               </div>
@@ -105,6 +102,7 @@ export default function TeacherHome() {
       </div>
 
 
+    </div>
     </div>
     </TeacherLayout>
   );

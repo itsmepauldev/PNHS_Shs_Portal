@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import AdminLayout from '../AdminLayout';
+import AdminLayout from "../../components/AdminLayout";
+
 
 export default function AdminScheduleManagement() {
   const [schedules, setSchedules] = useState([]);
@@ -37,33 +38,32 @@ export default function AdminScheduleManagement() {
     setItemsPerPage(window.innerWidth < 576 ? 4 : 8);
   }, []);
 
-useEffect(() => {
-  const filtered = schedules.filter((schedule) => {
-    const section = schedule.section;
-    if (!section) return false;
+  useEffect(() => {
+    const filtered = schedules.filter((schedule) => {
+      const section = schedule.section;
+      if (!section) return false;
 
-    const matchesSearch =
-      section.section_name.toLowerCase().includes(search.toLowerCase()) ||
-      (section.adviser?.name || '').toLowerCase().includes(search.toLowerCase());
+      const matchesSearch =
+        section.section_name.toLowerCase().includes(search.toLowerCase()) ||
+        (section.adviser?.name || '').toLowerCase().includes(search.toLowerCase());
 
-    const matchesGrade =
-      !filterGrade || String(section.grade_level) === filterGrade;
+      const matchesGrade =
+        !filterGrade || String(section.grade_level) === filterGrade;
 
-    const matchesStrand =
-      !filterStrand || section.strand === filterStrand;
+      const matchesStrand =
+        !filterStrand || section.strand === filterStrand;
 
-    const matchesSY =
-      !filterSY || section.school_year === filterSY;
+      const matchesSY =
+        !filterSY || section.school_year === filterSY;
 
-    const matchesSem =
-      !filterSem || section.semester === filterSem;
+      const matchesSem =
+        !filterSem || section.semester === filterSem;
 
-    return matchesSearch && matchesGrade && matchesStrand && matchesSY && matchesSem;
-  });
+      return matchesSearch && matchesGrade && matchesStrand && matchesSY && matchesSem;
+    });
 
-  setFilteredSchedules(filtered);
-}, [schedules, search, filterGrade, filterStrand, filterSY, filterSem]);
-
+    setFilteredSchedules(filtered);
+  }, [schedules, search, filterGrade, filterStrand, filterSY, filterSem]);
 
   const totalPages = Math.ceil(filteredSchedules.length / itemsPerPage);
   const paginatedSchedules = filteredSchedules.slice(
@@ -71,108 +71,52 @@ useEffect(() => {
     currentPage * itemsPerPage
   );
 
-  const handleAddSchedule = async () => {
-    const usedSectionIds = schedules.map((s) => s.section_id);
-    const availableSections = sections.filter((s) => !usedSectionIds.includes(s.id));
+  // const handleEditSchedule = async (id, currentSectionId) => {
+  //   const sectionOptionsHtml = sections
+  //     .map(
+  //       (s) => `
+  //         <option value="${s.id}" ${s.id === currentSectionId ? 'selected' : ''}>
+  //           ${s.section_name} – Grade ${s.grade_level} (${s.strand})
+  //         </option>
+  //       `
+  //     )
+  //     .join('');
 
-    const { value: selected } = await Swal.fire({
-      title: 'Add Class Schedule',
-      html: `
-        <div class="d-flex flex-column gap-2">
-          <label for="swal-section" class="form-label">Select Section</label>
-          <select id="swal-section" class="swal2-select" style="margin: 0; color: #6c757d;">
-            <option value="" disabled selected hidden>Select Section</option>
-            ${availableSections
-              .map(
-                (s) =>
-                  `<option value="${s.id}">${s.section_name} – Grade ${s.grade_level} (${s.strand})</option>`
-              )
-              .join('')}
-          </select>
-        </div>
-      `,
-      showCancelButton: true,
-      confirmButtonText: 'Create',
-      cancelButtonText: 'Cancel',
-      focusConfirm: false,
-      didOpen: () => {
-        const select = document.getElementById('swal-section');
-        select.addEventListener('change', function () {
-          this.style.color = this.value === '' ? '#6c757d' : '#212529';
-        });
-      },
-      preConfirm: () => {
-        const section = document.getElementById('swal-section').value;
-        if (!section) {
-          Swal.showValidationMessage('Please select a section');
-        }
-        return section;
-      },
-    });
+  //   const { value: selected } = await Swal.fire({
+  //     title: 'Edit Class Schedule',
+  //     html: `
+  //       <div class="d-flex flex-column gap-2">
+  //         <label for="swal-edit-section" class="form-label">Select Section</label>
+  //         <select id="swal-edit-section" class="swal2-select" style="margin: 0; color: #212529;">
+  //           ${sectionOptionsHtml}
+  //         </select>
+  //       </div>
+  //     `,
+  //     showCancelButton: true,
+  //     confirmButtonText: 'Update',
+  //     cancelButtonText: 'Cancel',
+  //     focusConfirm: false,
+  //     preConfirm: () => {
+  //       const section = document.getElementById('swal-edit-section').value;
+  //       if (!section) {
+  //         Swal.showValidationMessage('Please select a section');
+  //       }
+  //       return section;
+  //     },
+  //   });
 
-    if (selected) {
-      try {
-        await axios.post('http://shs-portal.test/api/schedules', {
-          section_id: selected,
-        });
-        fetchSchedules();
-        Swal.fire('Success!', 'Schedule created!', 'success');
-      } catch (err) {
-        Swal.fire('Error', err.response?.data?.message || 'Failed to create schedule.', 'error');
-      }
-    }
-  };
-
-  const handleEditSchedule = async (id, currentSectionId) => {
-    const availableSections = sections.filter(
-      (s) => !schedules.some((sch) => sch.section_id === s.id) || s.id === currentSectionId
-    );
-
-    const sectionOptionsHtml = availableSections
-      .map(
-        (s) => `
-          <option value="${s.id}" ${s.id === currentSectionId ? 'selected' : ''}>
-            ${s.section_name} – Grade ${s.grade_level} (${s.strand})
-          </option>
-        `
-      )
-      .join('');
-
-    const { value: selected } = await Swal.fire({
-      title: 'Edit Class Schedule',
-      html: `
-        <div class="d-flex flex-column gap-2">
-          <label for="swal-edit-section" class="form-label">Select Section</label>
-          <select id="swal-edit-section" class="swal2-select" style="margin: 0; color: #212529;">
-            ${sectionOptionsHtml}
-          </select>
-        </div>
-      `,
-      showCancelButton: true,
-      confirmButtonText: 'Update',
-      cancelButtonText: 'Cancel',
-      focusConfirm: false,
-      preConfirm: () => {
-        const section = document.getElementById('swal-edit-section').value;
-        if (!section) {
-          Swal.showValidationMessage('Please select a section');
-        }
-        return section;
-      },
-    });
-
-    if (selected) {
-      try {
-        await axios.put(`http://shs-portal.test/api/schedules/${id}`, {
-          section_id: selected,
-        });
-        fetchSchedules();
-        Swal.fire('Updated!', 'Schedule updated successfully.', 'success');
-      } catch (err) {
-        Swal.fire('Error', err.response?.data?.message || 'Failed to update schedule.', 'error');
-      }
-    }
-  };
+  //   if (selected) {
+  //     try {
+  //       await axios.put(`http://shs-portal.test/api/schedules/${id}`, {
+  //         section_id: selected,
+  //       });
+  //       fetchSchedules();
+  //       Swal.fire('Updated!', 'Schedule updated successfully.', 'success');
+  //     } catch (err) {
+  //       Swal.fire('Error', err.response?.data?.message || 'Failed to update schedule.', 'error');
+  //     }
+  //   }
+  // };
 
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
@@ -193,12 +137,10 @@ useEffect(() => {
 
   return (
     <AdminLayout>
-      <div className="container-fluid mt-4 px-3">
+   <div style={{ backgroundColor: '#f3f3f3', minHeight: '100vh'  }}>
+<div className="container-fluid p-3" style={{ backgroundColor: '#f3f3f3' }}>
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h3 className="mb-0">Schedule Management</h3>
-          <button className="btn btn-primary" onClick={handleAddSchedule}>
-            Add Schedule
-          </button>
+          <h3 className="mb-0 text-danger fw-bold">Schedule Management</h3>
         </div>
 
         {/* Filters */}
@@ -264,8 +206,8 @@ useEffect(() => {
         </div>
 
         {/* Table */}
-        <table className="table table-bordered">
-          <thead>
+       <table className="table table-bordered table-hover bg-white">
+                <thead className="table-danger">
             <tr>
               <th>#</th>
               <th>Section Name</th>
@@ -293,28 +235,35 @@ useEffect(() => {
                   <td>{schedule.section?.school_year || 'N/A'} {schedule.section?.semester || 'N/A'} Semester</td>
                   <td>
                     <div className="d-flex flex-column flex-md-row gap-1">
-                      <button
-                        className="btn btn-success btn-sm me-2"
+                      
+
+                        <button
+                      className="btn btn-sm d-flex align-items-center gap-1 text-primary fw-bold text-uppercase"
+                      style={{ background: 'transparent', border: 'none' }}
+   
                         onClick={() =>
                           navigate(`/admin/schedules/${schedule.id}`, {
                             state: { sectionId: schedule.section_id },
                           })
                         }
                       >
+                        <i className="bi bi-eye"></i>
                         View
                       </button>
-                      <button
+                      {/* <button
                         className="btn btn-warning btn-sm me-2"
                         onClick={() =>
                           handleEditSchedule(schedule.id, schedule.section_id)
                         }
                       >
                         Edit
-                      </button>
+                      </button> */}
                       <button
-                        className="btn btn-danger btn-sm"
+                      className="btn btn-sm d-flex align-items-center gap-1 text-danger fw-bold text-uppercase"
+                      style={{ background: 'transparent', border: 'none' }}
                         onClick={() => handleDelete(schedule.id)}
                       >
+                      <i className="bi bi-trash"></i>
                         Delete
                       </button>
                     </div>
@@ -346,6 +295,8 @@ useEffect(() => {
           </div>
         )}
       </div>
+      </div>0\
     </AdminLayout>
   );
 }
+

@@ -1,15 +1,15 @@
 import React from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function StudentHeaderNav() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname.startsWith(path);
 
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
+  const handleNavigation = (path) => navigate(path);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -18,14 +18,11 @@ export default function StudentHeaderNav() {
   };
 
   return (
-    <nav
-      className="navbar navbar-expand-md navbar-dark px-3"
-      style={{ backgroundColor: "rgba(220, 53, 69, 0.8)" }} // transparent red
-    >
-      {/* Brand */}
+    <nav className="navbar navbar-expand-md navbar-dark bg-danger px-3 shadow-sm">
+      {/* Brand / Title */}
       <span className="navbar-brand fw-bold">Student Panel</span>
 
-      {/* Burger button */}
+      {/* Burger Menu */}
       <button
         className="navbar-toggler"
         type="button"
@@ -38,13 +35,13 @@ export default function StudentHeaderNav() {
         <span className="navbar-toggler-icon"></span>
       </button>
 
-      {/* Nav Links */}
+      {/* Links */}
       <div className="collapse navbar-collapse" id="studentNavbar">
-        <ul className="navbar-nav ms-auto">
+        <ul className="navbar-nav ms-auto align-items-center">
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/student/home") ? "fw-bold text-warning" : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/student/home") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/student/home")}
             >
@@ -54,8 +51,8 @@ export default function StudentHeaderNav() {
 
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/my-schedule") ? "fw-bold text-warning" : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/my-schedule") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/my-schedule")}
             >
@@ -65,19 +62,28 @@ export default function StudentHeaderNav() {
 
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/my-violations") ? "fw-bold text-warning" : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/my-violations") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/my-violations")}
             >
-              My Violation
+              My Violations
             </button>
           </li>
-
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/student/documents") ? "fw-bold text-warning" : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/student/grades") ? "fw-bold text-light" : "text-white-50"
+              }`}
+              onClick={() => handleNavigation("/student/grades")}
+            >
+              Grades
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/student/documents") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/student/documents")}
             >
@@ -86,9 +92,9 @@ export default function StudentHeaderNav() {
           </li>
 
           {/* Logout */}
-          <li className="nav-item">
+          <li className="nav-item ms-md-3">
             <button
-              className="btn btn-light text-danger ms-md-3 mt-2 mt-md-0"
+              className="btn btn-light btn-sm fw-semibold px-3 py-1 mt-2 mt-md-0"
               onClick={handleLogout}
             >
               Logout

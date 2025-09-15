@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import echo from "../echo";
-import AdviserLayout from "./AdviserLayout";
-
+import echo from "../../echo";
+import AdviserLayout from '../../components/AdviserLayout';
 export default function AdviserSections() {
   const navigate = useNavigate();
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
@@ -68,7 +67,7 @@ export default function AdviserSections() {
   return (
     <AdviserLayout>
       <div className="container-fluid">
-        <h2 className="mb-3">Assigned Sections</h2>
+        <h2 className="mb-3 fw-bold text-danger">Assigned Sections</h2>
         <p className="lead text-muted">
           These are the sections currently assigned to you.
         </p>
@@ -92,7 +91,7 @@ export default function AdviserSections() {
                       <strong>Strand:</strong> {section.strand}
                     </p>
                     <button
-                      className="btn btn-success"
+                      className="btn btn-danger"
                       onClick={() => navigate(`/adviser/section/${section.id}`)}
                     >
                       Manage Section

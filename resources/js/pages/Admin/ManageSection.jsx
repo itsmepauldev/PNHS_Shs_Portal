@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import AdminLayout from '../AdminLayout'; // Your layout wrapper
+import AdminLayout from "../../components/AdminLayout";
 
 export default function ManageSection() {
   const { id } = useParams();
@@ -78,11 +78,11 @@ const fetchUsers = async () => {
   const changePageTeachers = (page) => setCurrentPageTeachers(page);
   const changePageStudents = (page) => setCurrentPageStudents(page);
 
-  const handleAssignTeacher = async () => {
+const handleAssignTeacher = async () => {
   const teacherOptions = allUsers
-     .filter(user => user.role === 'teacher' || user.role === 'adviser')
-  .map(user => `<option value="${user.id}">${user.name} (${user.role})</option>`)
-  .join('');
+    .filter(user => user.role === 'teacher' || user.role === 'adviser')
+    .map(user => `<option value="${user.id}">${user.name} (${user.role})</option>`)
+    .join('');
 
   const { value: formValues } = await Swal.fire({
     title: 'Assign Subject Teacher',
@@ -108,10 +108,21 @@ const fetchUsers = async () => {
     preConfirm: () => {
       const teacherId = document.getElementById('swal-teacher').value;
       const subject = document.getElementById('swal-subject').value.trim();
+
       if (!teacherId || !subject) {
         Swal.showValidationMessage('All fields are required.');
         return false;
       }
+
+      // 🔎 Conflict check before submitting
+      const exists = subjectTeachers.some(
+        (t) => t.subject.toLowerCase() === subject.toLowerCase()
+      );
+      if (exists) {
+        Swal.showValidationMessage('This subject is already assigned to another teacher.');
+        return false;
+      }
+
       return { teacher_id: teacherId, subject };
     },
   });
@@ -127,8 +138,8 @@ const fetchUsers = async () => {
       setSubjectTeachers(updated.data);
       setCurrentPageTeachers(1);
       Swal.fire('Success', 'Teacher assigned.', 'success');
-    } catch {
-      Swal.fire('Error', 'Assignment failed.', 'error');
+    } catch (error) {
+      Swal.fire('Error', error.response?.data?.error || 'Assignment failed.', 'error');
     }
   }
 };
@@ -335,16 +346,118 @@ const handleRemoveFromSection = async (studentId) => {
 
 
   if (loading) return <div className="text-center p-5">Loading...</div>;
+// Edit subject teacher
+// Edit subject teacher
+const handleEditTeacher = async (teacher) => {
+  const teacherOptions = allUsers
+    .filter(user => user.role === 'teacher' || user.role === 'adviser')
+    .map(user =>
+      `<option value="${user.id}" ${user.name === teacher.teacher_name ? 'selected' : ''}>
+        ${user.name} (${user.role})
+      </option>`
+    )
+    .join('');
+
+  const { value: formValues } = await Swal.fire({
+    title: 'Edit Subject Teacher',
+    html: `
+      <div class="d-flex flex-column gap-2">
+        <select id="swal-teacher" class="swal2-input" style="margin: 0; color: #212529;">
+          <option value="" disabled hidden>Select Teacher</option>
+          ${teacherOptions}
+        </select>
+        <input id="swal-subject" class="swal2-input" value="${teacher.subject}" placeholder="Enter Subject" style="margin:0;" />
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Update',
+    focusConfirm: false,
+    didOpen: () => {
+      const teacherSelect = document.getElementById('swal-teacher');
+      teacherSelect.addEventListener('change', function () {
+        this.style.color = this.value === '' ? '#6c757d' : '#212529';
+      });
+    },
+    preConfirm: () => {
+      const teacherId = document.getElementById('swal-teacher').value;
+      const subject = document.getElementById('swal-subject').value.trim();
+
+      if (!teacherId || !subject) {
+        Swal.showValidationMessage('All fields are required.');
+        return false;
+      }
+
+      // 🔎 Conflict check (exclude the current teacher being edited)
+      const exists = subjectTeachers.some(
+        (t) =>
+          t.subject.toLowerCase() === subject.toLowerCase() &&
+          t.id !== teacher.id
+      );
+
+      if (exists) {
+        Swal.showValidationMessage('This subject is already assigned to another teacher.');
+        return false;
+      }
+
+      return { teacher_id: teacherId, subject };
+    },
+  });
+
+  if (formValues) {
+    try {
+      await axios.put(`/api/sections/${id}/subject-teachers/${teacher.id}`, formValues, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      // Refresh teacher list
+      const updated = await axios.get(`/api/sections/${id}/subject-teachers`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      setSubjectTeachers(updated.data);
+      Swal.fire('Updated!', 'Subject teacher updated successfully.', 'success');
+    } catch (err) {
+      console.error(err);
+      Swal.fire('Error', 'Update failed.', 'error');
+    }
+  }
+};
+
+
+
+// Remove subject teacher
+const handleRemoveTeacher = async (teacherId) => {
+  const confirm = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'This will remove the subject teacher from the section.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    confirmButtonText: 'Yes, remove',
+  });
+
+  if (confirm.isConfirmed) {
+    try {
+      await axios.delete(`/api/sections/${id}/subject-teachers/${teacherId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      setSubjectTeachers((prev) => prev.filter((t) => t.id !== teacherId));
+      Swal.fire('Removed!', 'Teacher removed from section.', 'success');
+    } catch (err) {
+      console.error(err);
+      Swal.fire('Error!', 'Failed to remove teacher.', 'error');
+    }
+  }
+};
 
   return (
     <AdminLayout>
-    <div className="container-fluid mt-4 px-3">
-        <h3>Manage Section: {section.section_name}</h3>
+        <div style={{ backgroundColor: '#f3f3f3', minHeight: '100vh'  }}>
+<div className="container-fluid p-3" style={{ backgroundColor: '#f3f3f3' }}>
+        <h3 className='fw-bold text-danger mb-4'>Manage Section: {section.section_name}</h3>
         <p><strong>Grade:</strong> {section.grade_level} | <strong>Strand:</strong> {section.strand}</p>
 
-        <div className="mb-3">
-          <button className="btn btn-primary me-2" onClick={handleAssignTeacher}>➕ Add Subject Teacher</button>
-          <button className="btn btn-success" onClick={handleAddStudent}>➕ Add Student</button>
+        <div className="mb-3 d-flex gap-2 flex-wrap">
+          <button className="btn btn-link text-success fw-bold text-uppercase d-flex align-items-center gap-1 p-0 text-decoration-none" onClick={handleAssignTeacher}><i className="bi bi-person-plus"></i> Add Subject Teacher</button>
+          <button className="btn btn-link text-success fw-bold text-uppercase d-flex align-items-center gap-1 p-0 text-decoration-none" onClick={handleAddStudent}><i className="bi bi-person-plus"></i> Add Student</button>
         </div>
 
         <ul className="nav nav-tabs mb-3">
@@ -359,14 +472,15 @@ const handleRemoveFromSection = async (studentId) => {
         <div className="card">
           <div className="card-body p-0">
             <div className="table-responsive">
-              <table className="table table-bordered table-hover mb-0">
-              <thead className="table-dark">
+             <table className="table table-bordered table-hover bg-white">
+            <thead className="table-danger">
   <tr>
     <th>#</th>
     {activeTab === 'teachers' ? (
       <>
         <th>Teacher Name</th>
         <th>Subject</th>
+        <th>Action</th>
       </>
     ) : (
       <>
@@ -388,14 +502,28 @@ const handleRemoveFromSection = async (studentId) => {
               <tbody>
                 {activeTab === 'teachers' ? (
                   paginatedTeachers.length > 0 ? (
-                    paginatedTeachers.map((t, index) => (
-                      <tr key={t.id}>
-                        <td>{(currentPageTeachers - 1) * itemsPerPage + index + 1}</td>
-                        <td>{t.teacher_name}</td>
-                        <td>{t.subject.charAt(0).toUpperCase() + t.subject.slice(1)}</td>
-                      </tr>
-                    ))
-                  ) : (
+                   paginatedTeachers.map((t, index) => (
+    <tr key={t.id}>
+      <td>{(currentPageTeachers - 1) * itemsPerPage + index + 1}</td>
+      <td>{t.teacher_name}</td>
+      <td>{t.subject.charAt(0).toUpperCase() + t.subject.slice(1)}</td>
+      <td className="d-flex gap-1 flex-wrap">
+        <button
+          className="btn btn-link text-primary fw-bold text-uppercase d-flex align-items-center gap-1 p-0 text-decoration-none"
+          onClick={() => handleEditTeacher(t)}
+        >
+          <i className="bi bi-pencil"></i> Edit
+        </button>
+        <button
+          className="btn btn-link text-danger fw-bold text-uppercase d-flex align-items-center gap-1 p-0 text-decoration-none"
+          onClick={() => handleRemoveTeacher(t.id)}
+        >
+          <i className="bi bi-trash"></i> Remove
+        </button>
+      </td>
+    </tr>
+  ))
+) : (
                     <tr>
                       <td colSpan="3" className="text-center">No subject teachers yet.</td>
                     </tr>
@@ -416,23 +544,20 @@ const handleRemoveFromSection = async (studentId) => {
   <td>
   {s.student?.emergency_phone || '--'}
 </td>
-<td>
-  <button 
-    className="btn btn-sm btn-primary me-2"
-    onClick={() => handleEdit(s)}
-  >
-    Edit
-  </button>
- 
-
-<button onClick={() => handleRemoveFromSection(s.id)} className="btn btn-sm btn-danger">
-  Remove
-</button>
-
-
-
-</td>
-
+ <td className="d-flex gap-1 flex-wrap">
+                            <button
+                              className="btn btn-link text-primary fw-bold text-uppercase d-flex align-items-center gap-1 p-0 text-decoration-none"
+                              onClick={() => handleEdit(s)}
+                            >
+                              <i className="bi bi-pencil"></i> Edit
+                            </button>
+                            <button
+                              className="btn btn-link text-danger fw-bold text-uppercase d-flex align-items-center gap-1 p-0 text-decoration-none"
+                              onClick={() => handleRemoveFromSection(s.id)}
+                            >
+                              <i className="bi bi-trash"></i> Remove
+                            </button>
+                          </td>
 </tr>
 
 
@@ -456,7 +581,7 @@ const handleRemoveFromSection = async (studentId) => {
           <Pagination page={currentPageStudents} total={totalPagesStudents} onChange={changePageStudents} />
         )}
 
-        
+        </div>
       </div>
     </AdminLayout>
   );
@@ -475,5 +600,6 @@ function Pagination({ page, total, onChange }) {
         </ul>
       </nav>
     </div>
+   
   );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import StudentLayout from './StudentLayout'; 
+import StudentLayout from '../../components/StudentLayout'; 
 
 export default function MyViolations() {
   const navigate = useNavigate();
@@ -36,13 +36,14 @@ export default function MyViolations() {
 
   return (
     <StudentLayout>
-    <div className="container-fluid ">
-      <h2>My Violations</h2>
+         <div style={{ backgroundColor: '#f3f3f3', minHeight: '100vh'  }}>
+<div className="container-fluid p-3" style={{ backgroundColor: '#f3f3f3' }}>
+      <h2 className='fw-bold text-danger'>My Violations</h2>
       {violations.length === 0 ? (
         <p>You have no violations recorded.</p>
       ) : (
-        <table className="table table-bordered mt-3">
-          <thead>
+       <table className="table table-bordered table-hover bg-white">
+            <thead className="table-danger">
             <tr>
               <th>Violation Type</th>
               <th>Offense Level</th>
@@ -62,7 +63,7 @@ export default function MyViolations() {
           </tbody>
         </table>
       )}
-   
+   </div>
     </div>
     </StudentLayout>
   );

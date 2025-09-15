@@ -127,8 +127,7 @@
 // }
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import StudentLayout from './StudentLayout';
-
+import StudentLayout from '../../components/StudentLayout'; 
 export default function StudentSchedule() {
   const [schedule, setSchedule] = useState([]);
   const printRef = useRef();
@@ -198,8 +197,10 @@ export default function StudentSchedule() {
 
   return (
     <StudentLayout>
-      <div className="container-fluid ">
-        <h2>Student Schedule</h2>
+             <div style={{ backgroundColor: '#f3f3f3', minHeight: '100vh'  }}>
+<div className="container-fluid p-3" style={{ backgroundColor: '#f3f3f3' }}>
+        <div className="container-fluid p-3" style={{ backgroundColor: "#f3f3f3" }}>
+        <h2 className='fw-bold text-danger'>Student Schedule</h2>
 
         <div ref={printRef}>
           <p>
@@ -210,8 +211,9 @@ export default function StudentSchedule() {
           {!hasSchedule ? (
             <p>No schedule assigned or still loading...</p>
           ) : (
-            <table className="table table-bordered table-striped">
-              <thead className="thead-dark">
+            <table className="table table-bordered table-hover bg-white">
+            <thead className="table-danger">
+
                 <tr>
                   <th>Subject</th>
                   <th>Section</th>
@@ -256,12 +258,14 @@ export default function StudentSchedule() {
         <div className="d-flex justify-content-end align-items-center mb-3">
           <button
             onClick={handlePrint}
-            className="btn btn-primary"
+            className="btn btn-danger"
             disabled={!hasSchedule} // ✅ disable if no schedule entries
           >
             Print Schedule
           </button>
         </div>
+        </div>
+      </div>
       </div>
     </StudentLayout>
   );

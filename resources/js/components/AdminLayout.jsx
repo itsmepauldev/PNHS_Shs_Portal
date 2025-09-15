@@ -38,7 +38,7 @@ export default function AdminLayout({ children }) {
   return (
     <>
       <HeaderNav />
-      <div className="container-fluid p-3">{children}</div>
+      <div >{children}</div>
     </>
   );
 }

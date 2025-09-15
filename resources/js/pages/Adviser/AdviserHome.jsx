@@ -182,8 +182,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import echo from '../echo'; // 👈 Make sure this exists and is correctly configured
-import AdviserLayout from './AdviserLayout';
+import echo from '../../echo'; // 👈 Make sure this exists and is correctly configured
+import AdviserLayout from '../../components/AdviserLayout';
 // ...keep the same imports
 
 export default function AdviserHome() {
@@ -229,11 +229,11 @@ export default function AdviserHome() {
   return (
     <AdviserLayout>
       <div className="container-fluid">
-        <h2 className="mb-3">Welcome, {user?.name || "Adviser"}!</h2>
+        <h2 className="mb-3 fw-bold text-danger">Welcome, {user?.name || "Adviser"}!</h2>
         <p className="lead text-muted">This is your Adviser dashboard.</p>
 
         {/* 📘 Assigned Subjects */}
-        <h4 className="mt-5">Assigned Subjects</h4>
+        <h4 className="mt-5 fw-bold text-danger">Assigned Subjects</h4>
         {loadingSubjects ? (
           <div className="text-center w-100 py-5">
             <div className="spinner-border text-primary" role="status" />
@@ -256,16 +256,10 @@ export default function AdviserHome() {
                       <br />
                       <strong>Strand:</strong> {item.section.strand}
                     </p>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() =>
-                        navigate(
-                          `/teacher/section/${item.section.id}/subject/${item.subject}`
-                        )
-                      }
-                    >
-                      Manage Grades
-                    </button>
+                   <button className="btn btn-secondary" disabled>
+                    Manage Grades (Coming Soon)
+                  </button>
+
                   </div>
                 </div>
               </div>

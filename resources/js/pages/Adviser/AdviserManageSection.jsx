@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import AdviserLayout from './AdviserLayout';
-
+import AdviserLayout from '../../components/AdviserLayout';
 export default function AdviserManageSection() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -198,8 +197,9 @@ export default function AdviserManageSection() {
 
   return (
     <AdviserLayout>
-      <div className="container-fluid">
-        <h3 className="mb-3">Manage Section: {section.section_name}</h3>
+       <div style={{ backgroundColor: '#f3f3f3', minHeight: '100vh'  }}>
+<div className="container-fluid p-3" style={{ backgroundColor: '#f3f3f3' }}>
+        <h3 className="fw-bold text-danger mb-3">Manage Section: {section.section_name}</h3>
         <p>
           <strong>Grade:</strong> {section.grade_level} | <strong>Strand:</strong> {section.strand}
         </p>
@@ -229,7 +229,7 @@ export default function AdviserManageSection() {
           <div className="card-body p-0">
             <div className="table-responsive mb-0">
               <table className="table table-bordered table-hover mb-0">
-                <thead className="table-dark">
+                <thead className="table-danger">
                   <tr>
                     <th>#</th>
                     {activeTab === 'teachers' ? (
@@ -281,20 +281,25 @@ export default function AdviserManageSection() {
                         <td>{s.student?.home_address || 'No Data Yet'}</td>
                         <td>{s.student?.contact_number || 'No Data Yet'}</td>
                         <td>{s.student?.emergency_phone || 'No Data Yet'}</td>
-                        <td>
+                       <td className="text-center">
+                      <div className="d-flex flex-wrap gap-1 justify-content-center">
                           <button
-                            className="btn btn-sm btn-primary me-2"
+  className="btn btn-sm d-flex align-items-center gap-1 text-primary fw-bold text-uppercase"style={{ background: 'transparent', border: 'none' }}
                             onClick={() => handleEdit(s)}
                           >
+                             <i className="bi bi-pencil-square"></i>
                             Edit
                           </button>
                           <button
                             onClick={() => handleRemoveFromSection(s.id)}
-                            className="btn btn-sm btn-danger"
-                          >
+ className="btn btn-sm d-flex align-items-center gap-1 text-danger fw-bold text-uppercase"
+    style={{ background: 'transparent', border: 'none' }}                          >
+                             <i className="bi bi-trash"></i>
                             Remove
                           </button>
+                            </div>
                         </td>
+                      
                       </tr>
                     ))
                   ) : (
@@ -349,6 +354,7 @@ export default function AdviserManageSection() {
             </nav>
           </div>
         )}
+      </div>
       </div>
     </AdviserLayout>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
-import AdminLayout from '../AdminLayout';
+import AdminLayout from "../../components/AdminLayout";
+
 
 export default function GradeManagement() {
   return (

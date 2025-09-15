@@ -60,37 +60,82 @@ class DocumentRequestController extends Controller
 
     // app/Http/Controllers/DocumentRequestController.php
 
-    public function store(Request $request)
-    {
-        // If you use Sanctum/Session auth, prefer: $studentId = $request->user()->id;
-        $validated = $request->validate([
-            'student_id' => 'required|exists:users,id',
-            'document' => 'required|in:Good Moral,Form 137,Enrollment Certificate',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     // If you use Sanctum/Session auth, prefer: $studentId = $request->user()->id;
+    //     $validated = $request->validate([
+    //         'student_id' => 'required|exists:users,id',
+    //         'document' => 'required|in:Good Moral,Form 137,Enrollment Certificate',
+    //     ]);
 
-        // Prevent duplicate pending request of same type
-        $exists = \App\Models\DocumentRequest::where('student_id', $validated['student_id'])
-            ->where('document', $validated['document'])
-            ->where('status', 'Pending')
-            ->exists();
+    //     // Prevent duplicate pending request of same type
+    //     $exists = \App\Models\DocumentRequest::where('student_id', $validated['student_id'])
+    //         ->where('document', $validated['document'])
+    //         ->where('status', 'Pending')
+    //         ->exists();
 
-        if ($exists) {
-            return response()->json([
-                'message' => 'You already have a pending request for this document.'
-            ], 422);
-        }
+    //     if ($exists) {
+    //         return response()->json([
+    //             'message' => 'You already have a pending request for this document.'
+    //         ], 422);
+    //     }
 
-        $req = \App\Models\DocumentRequest::create([
-            'student_id' => $validated['student_id'],
-            'document' => $validated['document'],
-            'status' => 'Pending',
-        ])->load('student');
+    //     $req = \App\Models\DocumentRequest::create([
+    //         'student_id' => $validated['student_id'],
+    //         'document' => $validated['document'],
+    //         'status' => 'Pending',
+    //     ])->load('student');
 
+    //     return response()->json([
+    //         'message' => 'Request submitted.',
+    //         'data' => $req,
+    //     ], 201);
+    // }
+
+   public function store(Request $request)
+{
+    $validated = $request->validate([
+        'student_id' => 'required|exists:users,id',
+        'document' => 'required|in:Good Moral,Form 137,Enrollment Certificate',
+    ]);
+
+    // Count only successful requests (Pending + Completed) — ignore Rejected
+    $totalRequests = \App\Models\DocumentRequest::where('student_id', $validated['student_id'])
+        ->where('document', $validated['document'])
+        ->whereIn('status', ['Pending', 'Completed']) // ✅ ignore rejected
+        ->count();
+
+    if ($totalRequests >= 3) {
         return response()->json([
-            'message' => 'Request submitted.',
-            'data' => $req,
-        ], 201);
+            'message' => 'You can only request this document up to 3 times.'
+        ], 422);
     }
+
+    // Prevent duplicate pending request of same type
+    $exists = \App\Models\DocumentRequest::where('student_id', $validated['student_id'])
+        ->where('document', $validated['document'])
+        ->where('status', 'Pending')
+        ->exists();
+
+    if ($exists) {
+        return response()->json([
+            'message' => 'You already have a pending request for this document.'
+        ], 422);
+    }
+
+    $req = \App\Models\DocumentRequest::create([
+        'student_id' => $validated['student_id'],
+        'document' => $validated['document'],
+        'status' => 'Pending',
+    ])->load('student');
+
+    return response()->json([
+        'message' => 'Request submitted.',
+        'data' => $req,
+    ], 201);
+}
+
+
     // app/Http/Controllers/DocumentRequestController.php
 
     public function myRequests(Request $request)

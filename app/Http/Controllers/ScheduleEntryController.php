@@ -146,9 +146,27 @@ class ScheduleEntryController extends Controller
             })
             ->exists();
 
+
+
         if ($conflictRoom) {
             return response()->json(['error' => 'Room is already booked at this time.'], 409);
         }
+
+        // Section conflict check
+        $conflictSection = ScheduleEntry::whereHas('schedule', function ($q) use ($request) {
+            $q->where('id', $request->schedule_id);
+        })
+            ->where('day', $request->day)
+            ->where(function ($q) use ($request) {
+                $q->where('start_time', '<', $request->end_time)
+                    ->where('end_time', '>', $request->start_time);
+            })
+            ->exists();
+
+        if ($conflictSection) {
+            return response()->json(['error' => 'This section already has a class at this time.'], 409);
+        }
+
 
         $entry = ScheduleEntry::create($request->all());
         return response()->json($entry);
@@ -253,6 +271,22 @@ class ScheduleEntryController extends Controller
             return response()->json(['error' => 'Room is already booked at this time.'], 409);
         }
 
+        // Section conflict check (exclude current entry)
+        $conflictSection = ScheduleEntry::whereHas('schedule', function ($q) use ($request) {
+            $q->where('id', $request->schedule_id);
+        })
+            ->where('id', '!=', $id)
+            ->where('day', $request->day)
+            ->where(function ($q) use ($request) {
+                $q->where('start_time', '<', $request->end_time)
+                    ->where('end_time', '>', $request->start_time);
+            })
+            ->exists();
+
+        if ($conflictSection) {
+            return response()->json(['error' => 'This section already has a class at this time.'], 409);
+        }
+
         // Save update
         $entry->update([
             'day' => $request->day,
@@ -287,4 +321,8 @@ class ScheduleEntryController extends Controller
         return response()->json($entries);
     }
 
+
+
+    
 }
+

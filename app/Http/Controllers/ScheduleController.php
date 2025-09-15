@@ -59,13 +59,29 @@ class ScheduleController extends Controller
         return response()->json($schedule);
     }
 
+    // public function destroy($id)
+    // {
+    //     $schedule = Schedule::findOrFail($id);
+    //     $schedule->delete();
+
+    //     return response()->json(['message' => 'Schedule deleted successfully.']);
+    // }
+
     public function destroy($id)
     {
         $schedule = Schedule::findOrFail($id);
+
+        // delete the related section
+        $section = Section::find($schedule->section_id);
+        if ($section) {
+            $section->delete();
+        }
+
         $schedule->delete();
 
-        return response()->json(['message' => 'Schedule deleted successfully.']);
+        return response()->json(['message' => 'Schedule and its section deleted successfully.']);
     }
+
     public function getScheduleBySection($sectionId)
     {
         $section = Section::findOrFail($sectionId);
@@ -121,3 +137,4 @@ class ScheduleController extends Controller
     }
 
 }
+

@@ -1,11 +1,12 @@
+// StudentHome.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import StudentLayout from './StudentLayout';
-
+import StudentLayout from '../../components/StudentLayout'; 
 export default function StudentHome() {
   const navigate = useNavigate();
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const [loading, setLoading] = useState(true);
 
   // Auto-logout if user deleted
   useEffect(() => {
@@ -18,6 +19,7 @@ export default function StudentHome() {
         });
         localStorage.setItem('user', JSON.stringify(res.data));
         setUser(res.data);
+        setLoading(false);
       } catch (error) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -25,19 +27,20 @@ export default function StudentHome() {
       }
     };
 
-    const interval = setInterval(checkUserStatus, 5000);
     checkUserStatus();
-
-    return () => clearInterval(interval);
   }, [navigate]);
 
+  if (loading) return null; // prevent rendering before user loaded
+
   return (
-    <StudentLayout>
-      <div className="container-fluid ">
-        <h2 className="mb-3">Welcome, {user?.name || 'Student'}!</h2>
-        <p className="lead text-muted">
-          This is your student dashboard. Use the sidebar to navigate your schedule, violations, and document requests.
-        </p>
+    <StudentLayout user={user}>
+      <div style={{ backgroundColor: '#f3f3f3', minHeight: '100vh' }}>
+        <div className="container-fluid p-3" style={{ backgroundColor: '#f3f3f3' }}>
+          <h2 className="mb-3">Welcome, {user?.name || 'Student'}!</h2>
+          <p className="lead text-muted">
+            This is your student dashboard. Use the sidebar to navigate your schedule, violations, and document requests.
+          </p>
+        </div>
       </div>
     </StudentLayout>
   );

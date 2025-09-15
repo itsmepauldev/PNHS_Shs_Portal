@@ -15,9 +15,7 @@ export default function TeacherHeaderNav() {
     return location.pathname === path;
   };
 
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
+  const handleNavigation = (path) => navigate(path);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -26,14 +24,11 @@ export default function TeacherHeaderNav() {
   };
 
   return (
-    <nav
-      className="navbar navbar-expand-md navbar-dark px-3"
-      style={{ backgroundColor: "rgba(220, 53, 69, 0.8)" }} // transparent red
-    >
+    <nav className="navbar navbar-expand-md navbar-dark bg-danger px-3 shadow-sm">
       {/* Brand */}
       <span className="navbar-brand fw-bold">Teacher Panel</span>
 
-      {/* Burger */}
+      {/* Burger Menu */}
       <button
         className="navbar-toggler"
         type="button"
@@ -48,11 +43,11 @@ export default function TeacherHeaderNav() {
 
       {/* Links */}
       <div className="collapse navbar-collapse" id="teacherNavbar">
-        <ul className="navbar-nav ms-auto">
+        <ul className="navbar-nav ms-auto align-items-center">
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/teacher/home") ? "fw-bold text-warning" : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/teacher/home") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/teacher/home")}
             >
@@ -62,10 +57,8 @@ export default function TeacherHeaderNav() {
 
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/teacher/schedule")
-                  ? "fw-bold text-warning"
-                  : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/teacher/schedule") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/teacher/schedule")}
             >
@@ -74,9 +67,9 @@ export default function TeacherHeaderNav() {
           </li>
 
           {/* Logout */}
-          <li className="nav-item">
+          <li className="nav-item ms-md-3">
             <button
-              className="btn btn-light text-danger ms-md-3 mt-2 mt-md-0"
+              className="btn btn-light btn-sm fw-semibold px-3 py-1 mt-2 mt-md-0"
               onClick={handleLogout}
             >
               Logout

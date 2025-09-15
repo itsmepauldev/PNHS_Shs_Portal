@@ -1,14 +1,15 @@
 import React from "react";
-import TeacherHeaderNav from "./TeacherHeaderNav"; // ✅ replace sidebar
+import TeacherHeaderNav from "./TeacherHeaderNav";
 
 export default function TeacherLayout({ children }) {
   return (
     <>
-      {/* Transparent Red Navbar */}
+      {/* Navbar */}
       <TeacherHeaderNav />
 
       {/* Page Content */}
-      <div className="pt-5 px-3">
+      <div className="" style={{ marginLeft: "0px", transition: "margin-left 0.3s ease-in-out" }}>
+      
         {children}
       </div>
     </>

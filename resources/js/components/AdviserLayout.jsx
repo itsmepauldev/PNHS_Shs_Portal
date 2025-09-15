@@ -1,14 +1,17 @@
 import React from "react";
-import AdviserHeaderNav from "./AdviserHeaderNav"; // ✅ use header nav instead of sidebar
+import AdviserHeaderNav from "./AdviserHeaderNav";
 
 export default function AdviserLayout({ children }) {
   return (
     <>
-      {/* Transparent Red Navbar */}
+      {/* Navbar */}
       <AdviserHeaderNav />
 
       {/* Page Content */}
-      <div className="pt-5 px-3">
+      <div
+        className="pt-5 px-3"
+        style={{ transition: "margin-left 0.3s ease-in-out" }}
+      >
         {children}
       </div>
     </>

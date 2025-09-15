@@ -20,9 +20,9 @@ export default function HeaderNav() {
   };
 
   return (
-    <nav className="navbar navbar-expand-md navbar-dark bg-dark px-3">
+    <nav className="navbar navbar-expand-md navbar-dark bg-danger px-3 shadow-sm">
       {/* Brand / Title */}
-      <span className="navbar-brand">SHS Portal</span>
+      <span className="navbar-brand fw-bold">SHS Portal</span>
 
       {/* Burger (toggle) */}
       <button
@@ -39,13 +39,11 @@ export default function HeaderNav() {
 
       {/* Collapsible Nav */}
       <div className="collapse navbar-collapse" id="navbarNav">
-        <ul className="navbar-nav ms-auto">
+        <ul className="navbar-nav ms-auto align-items-center">
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/admin/dashboard")
-                  ? "fw-bold text-primary"
-                  : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/admin/dashboard") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/admin/dashboard")}
             >
@@ -54,67 +52,61 @@ export default function HeaderNav() {
           </li>
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                (isActive("/admin/sections") || isActive("/admin/section"))
-                  ? "fw-bold text-primary"
-                  : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/admin/sections") || isActive("/admin/section")
+                  ? "fw-bold text-light"
+                  : "text-white-50"
               }`}
               onClick={() => handleNavigation("/admin/sections")}
             >
-              Section Management
+              Sections
             </button>
           </li>
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/admin/schedules")
-                  ? "fw-bold text-primary"
-                  : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/admin/schedules") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/admin/schedules")}
             >
-              Class Schedule
+              Schedule
             </button>
           </li>
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/admin/grades") ? "fw-bold text-primary" : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/admin/grades") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/admin/grades")}
             >
-              Grade Management
+              Grades
             </button>
           </li>
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/admin/violations")
-                  ? "fw-bold text-primary"
-                  : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/admin/violations") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/admin/violations")}
             >
-              Violation Management
+              Violations
             </button>
           </li>
           <li className="nav-item">
             <button
-              className={`nav-link btn btn-link ${
-                isActive("/admin/documents")
-                  ? "fw-bold text-primary"
-                  : "text-white"
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/admin/documents") ? "fw-bold text-light" : "text-white-50"
               }`}
               onClick={() => handleNavigation("/admin/documents")}
             >
-              Document Requests
+              Documents
             </button>
           </li>
 
           {/* Logout */}
-          <li className="nav-item">
+          <li className="nav-item ms-md-3">
             <button
-              className="btn btn-outline-danger ms-md-3 mt-2 mt-md-0"
+              className="btn btn-light btn-sm fw-semibold px-3 py-1 mt-2 mt-md-0"
               onClick={handleLogout}
             >
               Logout

@@ -33,6 +33,44 @@ class SectionController extends Controller
     }
 
 
+    // public function store(Request $request)
+    // {
+    //     list($semester, $school_year) = $this->getCurrentSemesterAndYear();
+
+    //     if (!$semester || !$school_year) {
+    //         return response()->json(['error' => 'Section creation is not allowed during this period (April–May).'], 403);
+    //     }
+
+    //     $request->validate([
+    //         'section_name' => 'required|string',
+    //         'strand' => 'required|string',
+    //         'grade_level' => 'required|string',
+    //         'adviser_id' => 'required|exists:users,id',
+    //     ]);
+
+    //     // Check for duplicate name in same sem/year
+    //     $exists = Section::where('section_name', $request->section_name)
+    //         ->where('school_year', $school_year)
+    //         ->where('semester', $semester)
+    //         ->exists();
+
+    //     if ($exists) {
+    //         return response()->json(['error' => 'Section name already exists for this semester and school year.'], 422);
+    //     }
+
+    //     $section = Section::create([
+    //         'section_name' => $request->section_name,
+    //         'strand' => $request->strand,
+    //         'grade_level' => $request->grade_level,
+    //         'adviser_id' => $request->adviser_id,
+    //         'semester' => $semester,
+    //         'school_year' => $school_year,
+    //     ]);
+
+    //     return response()->json(['section' => $section], 201);
+    // }
+
+
     public function store(Request $request)
     {
         list($semester, $school_year) = $this->getCurrentSemesterAndYear();
@@ -58,6 +96,7 @@ class SectionController extends Controller
             return response()->json(['error' => 'Section name already exists for this semester and school year.'], 422);
         }
 
+        // ✅ Create section
         $section = Section::create([
             'section_name' => $request->section_name,
             'strand' => $request->strand,
@@ -67,9 +106,16 @@ class SectionController extends Controller
             'school_year' => $school_year,
         ]);
 
-        return response()->json(['section' => $section], 201);
-    }
+        // ✅ Auto-create empty schedule for this section
+        $schedule = Schedule::create([
+            'section_id' => $section->id,
+        ]);
 
+        return response()->json([
+            'section' => $section,
+            'schedule' => $schedule,
+        ], 201);
+    }
 
     public function update(Request $request, $id)
     {
@@ -96,13 +142,27 @@ class SectionController extends Controller
         return response()->json(['message' => 'Section updated successfully', 'section' => $section]);
     }
 
+    // public function destroy($id)
+
+    // {
+    //     $section = Section::findOrFail($id);
+    //     $section->delete();
+
+    //     return response()->json(['message' => 'Section deleted successfully.']);
+    // }
+
     public function destroy($id)
     {
         $section = Section::findOrFail($id);
+
+        // delete related schedule(s)
+        Schedule::where('section_id', $section->id)->delete();
+
         $section->delete();
 
-        return response()->json(['message' => 'Section deleted successfully.']);
+        return response()->json(['message' => 'Section and its schedule deleted successfully.']);
     }
+
     public function show($id)
     {
         $section = Section::with('adviser')->findOrFail($id);
@@ -144,11 +204,18 @@ class SectionController extends Controller
         // $section = Section::findOrFail($id);
 
         // Assuming you have a subject_teachers table with teacher_id, section_id, subject
-        $teachers = \DB::table('subject_teachers')
-            ->join('users', 'users.id', '=', 'subject_teachers.teacher_id')
-            ->where('subject_teachers.section_id', $id)
-            ->select('subject_teachers.id', 'users.name as teacher_name', 'subject_teachers.subject')
-            ->get();
+       $teachers = \DB::table('subject_teachers')
+    ->join('users', 'users.id', '=', 'subject_teachers.teacher_id')
+    ->where('subject_teachers.section_id', $id)
+    ->select(
+    'subject_teachers.id',
+    'subject_teachers.teacher_id',
+    'users.name as teacher_name',
+    'subject_teachers.subject'
+)
+
+    ->get();
+
 
         return response()->json($teachers);
     }
@@ -299,6 +366,114 @@ class SectionController extends Controller
 
         return response()->json($entries);
     }
+
+
+
+
+
+
+
+
+
+
+public function updateSubjectTeacher(Request $request, $sectionId, $teacherId)
+{
+    $request->validate([
+        'teacher_id' => 'required|exists:users,id',
+        'subject' => 'required|string',
+    ]);
+
+    // 🔎 Check if another teacher is already assigned to the same subject in this section
+    $conflict = SubjectTeacher::where('section_id', $sectionId)
+        ->where('subject', $request->subject)
+        ->where('id', '!=', $teacherId) // exclude current row
+        ->exists();
+
+    if ($conflict) {
+        return response()->json(['error' => 'This subject is already assigned to another teacher in this section.'], 422);
+    }
+
+    $teacher = SubjectTeacher::where('section_id', $sectionId)->findOrFail($teacherId);
+
+    $oldTeacherId = $teacher->teacher_id; // keep track of old teacher
+
+    // ✅ Update teacher assignment and subject
+    $teacher->update([
+        'teacher_id' => $request->teacher_id,
+        'subject' => $request->subject,
+    ]);
+
+    // 🔄 Update schedule entries for this section (subject-specific)
+    $schedule = \App\Models\Schedule::where('section_id', $sectionId)->first();
+
+    if ($schedule) {
+        \App\Models\ScheduleEntry::where('schedule_id', $schedule->id)
+            ->where('teacher_id', $oldTeacherId)
+            ->where('subject', $request->subject) // only update matching subject
+            ->update(['teacher_id' => $request->teacher_id]);
+    }
+
+    return response()->json(['message' => 'Subject teacher updated successfully and schedule entries updated']);
+}
+
+
+
+
+
+
+
+   
+// public function updateSubjectTeacher(Request $request, $sectionId, $teacherId)
+// {
+//     $request->validate([
+//         'teacher_id' => 'required|exists:users,id',
+//         'subject' => 'required|string',
+//     ]);
+
+//     // 🔎 Check if another teacher is already assigned to the same subject in this section
+//     $conflict = SubjectTeacher::where('section_id', $sectionId)
+//         ->where('subject', $request->subject)
+//         ->where('id', '!=', $teacherId) // exclude current row
+//         ->exists();
+
+//     if ($conflict) {
+//         return response()->json(['error' => 'This subject is already assigned to another teacher in this section.'], 422);
+//     }
+
+//     $teacher = SubjectTeacher::where('section_id', $sectionId)->findOrFail($teacherId);
+
+//     // ✅ Update teacher assignment and subject
+//     $teacher->update([
+//         'teacher_id' => $request->teacher_id,
+//         'subject' => $request->subject,
+//     ]);
+
+//     return response()->json(['message' => 'Subject teacher updated successfully']);
+// }
+
+
+
+public function removeSubjectTeacher($sectionId, $teacherId)
+{
+    $teacher = SubjectTeacher::where('section_id', $sectionId)->findOrFail($teacherId);
+
+    // 🔎 Find the schedule for this section
+    $schedule = \App\Models\Schedule::where('section_id', $sectionId)->first();
+
+    if ($schedule) {
+        // 🗑 Delete all schedule entries for this teacher in this section's schedule
+        \App\Models\ScheduleEntry::where('schedule_id', $schedule->id)
+            ->where('teacher_id', $teacher->teacher_id)
+            ->delete();
+    }
+
+    // 🗑 Finally remove teacher from subject_teachers
+    $teacher->delete();
+
+    return response()->json(['message' => 'Subject teacher and related schedule entries removed successfully']);
+}
+
+
 
 
 }

@@ -248,3 +248,12 @@ Route::get('/document-requests', [DocumentRequestController::class, 'index']);
 Route::post('/document-requests', [DocumentRequestController::class, 'store']);
 Route::get('/my-document-requests', [DocumentRequestController::class, 'myRequests']); // Student
 Route::delete('/document-requests/{id}', [DocumentRequestController::class, 'destroy']);
+
+
+
+Route::put('/sections/{id}/subject-teachers/{teacher}', [SectionController::class, 'updateSubjectTeacher']);
+Route::delete('/sections/{id}/subject-teachers/{teacher}', [SectionController::class, 'removeSubjectTeacher']);
+
+
+
+
