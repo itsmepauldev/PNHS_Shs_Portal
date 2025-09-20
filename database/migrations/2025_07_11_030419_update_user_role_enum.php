@@ -10,12 +10,12 @@ return new class extends Migration {
      */
     public function up()
     {
-        DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'teacher', 'student', 'adviser') NOT NULL");
+        DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'teacher', 'student', 'adviser', 'guidance') NOT NULL");
     }
 
     public function down()
     {
-        DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'teacher', 'student') NOT NULL");
+        DB::statement("ALTER TABLE users MODIFY role ENUM('admin', 'teacher', 'student', 'adviser') NOT NULL");
     }
 
 };

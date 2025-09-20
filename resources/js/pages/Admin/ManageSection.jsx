@@ -78,51 +78,105 @@ const fetchUsers = async () => {
   const changePageTeachers = (page) => setCurrentPageTeachers(page);
   const changePageStudents = (page) => setCurrentPageStudents(page);
 
+// Subject mapping
+const subjectMapping = {
+  "HUMSS-11": ["Oral Communication", "Reading and Writing", "21st Century Literature", "Contemporary Philippine Arts", "Personal Development", "Understanding Culture, Society, and Politics"],
+  "HUMSS-12": ["Philosophy", "Creative Writing", "Disciplines and Ideas in Social Sciences", "Applied Economics"],
+  "TVL-EIM-11": ["Animation", "Computer Systems Servicing", "Technical Drafting", "Programming"],
+  "TVL-EIM-12": ["Entrepreneurship", "Animation", "Programming", "Computer Systems Servicing"],
+  "TVL-CSS-11": ["Computer Networking", "Hardware Servicing", "Technical Writing"],
+  "TVL-CSS-12": ["Networking Management", "Hardware Maintenance", "Web Development"],
+  "TVL-HE-11": ["Food and Beverage Services", "Front Office Services", "Housekeeping"],
+  "TVL-HE-12": ["Event Management", "Tourism Operations", "Culinary Arts"],
+};
+
+// Helper: Parse section_name to get grade & strand
+const parseSection = (sectionName) => {
+  const grade = sectionName.split('-')[0]; // first part is always grade
+  if (sectionName.includes('TVL:')) {
+    // e.g., "11-TVL: EIM-A"
+    const strandPart = sectionName.split('-')[1]; // "TVL: EIM"
+    const strand = strandPart.replace(': ', '-'); // "TVL-EIM"
+    return { grade, strand };
+  } else {
+    // e.g., "11-HUMSS-A"
+    const strand = sectionName.split('-')[1]; // "HUMSS"
+    return { grade, strand };
+  }
+};
+
+
+// Assign Subject Teacher
 const handleAssignTeacher = async () => {
   const teacherOptions = allUsers
     .filter(user => user.role === 'teacher' || user.role === 'adviser')
     .map(user => `<option value="${user.id}">${user.name} (${user.role})</option>`)
     .join('');
 
+  // Parse section to get mapping key
+  const parseSection = (sectionName) => {
+    const grade = sectionName.split('-')[0];
+    if (sectionName.includes('TVL:')) {
+      const strandPart = sectionName.split('-')[1];
+      const strand = strandPart.replace(': ', '-'); // "TVL-EIM"
+      return { grade, strand };
+    } else {
+      const strand = sectionName.split('-')[1]; // "HUMSS"
+      return { grade, strand };
+    }
+  };
+
+  const { grade, strand } = parseSection(section.section_name);
+  const subjectKey = `${strand}-${grade}`;
+
+  // Filter out subjects already assigned
+  const availableSubjects = (subjectMapping[subjectKey] || []).filter(
+    sub => !subjectTeachers.some(t => t.subject.toLowerCase() === sub.toLowerCase())
+  );
+
+  if (availableSubjects.length === 0) {
+    Swal.fire('No Available Subjects', 'All subjects for this section are already assigned.', 'info');
+    return;
+  }
+
+  const subjectOptions = availableSubjects
+    .map(sub => `<option value="${sub}">${sub}</option>`)
+    .join('');
+
   const { value: formValues } = await Swal.fire({
     title: 'Assign Subject Teacher',
     html: `
       <div class="d-flex flex-column gap-2">
-        <select id="swal-teacher" class="swal2-input" style="margin: 0; color: #6c757d;"
+        <select id="swal-teacher" class="swal2-input" style="margin:0; color:#6c757d;"
           onchange="this.style.color = (this.value === '') ? '#6c757d' : '#212529'">
           <option value="" disabled selected hidden>Select Teacher</option>
           ${teacherOptions}
         </select>
-        <input id="swal-subject" class="swal2-input" placeholder="Enter Subject" style="margin: 0;" />
-      </div>`,
+        <select id="swal-subject" class="swal2-input" style="margin:0; color:#6c757d;"
+          onchange="this.style.color = (this.value === '') ? '#6c757d' : '#212529'">
+          <option value="" disabled selected hidden>Select Subject</option>
+          ${subjectOptions}
+        </select>
+      </div>
+    `,
     showCancelButton: true,
     confirmButtonText: 'Assign',
     focusConfirm: false,
     didOpen: () => {
-      const teacherSelect = document.getElementById('swal-teacher');
-      teacherSelect.style.color = teacherSelect.value === '' ? '#6c757d' : '#212529';
-      teacherSelect.addEventListener('change', function () {
+      document.getElementById('swal-teacher').addEventListener('change', function () {
+        this.style.color = this.value === '' ? '#6c757d' : '#212529';
+      });
+      document.getElementById('swal-subject').addEventListener('change', function () {
         this.style.color = this.value === '' ? '#6c757d' : '#212529';
       });
     },
     preConfirm: () => {
       const teacherId = document.getElementById('swal-teacher').value;
-      const subject = document.getElementById('swal-subject').value.trim();
-
+      const subject = document.getElementById('swal-subject').value;
       if (!teacherId || !subject) {
         Swal.showValidationMessage('All fields are required.');
         return false;
       }
-
-      // 🔎 Conflict check before submitting
-      const exists = subjectTeachers.some(
-        (t) => t.subject.toLowerCase() === subject.toLowerCase()
-      );
-      if (exists) {
-        Swal.showValidationMessage('This subject is already assigned to another teacher.');
-        return false;
-      }
-
       return { teacher_id: teacherId, subject };
     },
   });
@@ -352,10 +406,28 @@ const handleEditTeacher = async (teacher) => {
   const teacherOptions = allUsers
     .filter(user => user.role === 'teacher' || user.role === 'adviser')
     .map(user =>
-      `<option value="${user.id}" ${user.name === teacher.teacher_name ? 'selected' : ''}>
+      `<option value="${user.id}" ${user.id === teacher.teacher_id ? 'selected' : ''}>
         ${user.name} (${user.role})
       </option>`
     )
+    .join('');
+
+  const { grade, strand } = parseSection(section.section_name);
+  const subjectKey = `${strand}-${grade}`;
+
+  const availableSubjects = (subjectMapping[subjectKey] || []).filter(
+    sub => !subjectTeachers.some(
+      t => t.subject.toLowerCase() === sub.toLowerCase() && t.id !== teacher.id
+    )
+  );
+
+  // Include current subject so it can still be selected
+  if (!availableSubjects.includes(teacher.subject)) {
+    availableSubjects.push(teacher.subject);
+  }
+
+  const subjectOptions = availableSubjects
+    .map(sub => `<option value="${sub}" ${sub === teacher.subject ? 'selected' : ''}>${sub}</option>`)
     .join('');
 
   const { value: formValues } = await Swal.fire({
@@ -366,39 +438,30 @@ const handleEditTeacher = async (teacher) => {
           <option value="" disabled hidden>Select Teacher</option>
           ${teacherOptions}
         </select>
-        <input id="swal-subject" class="swal2-input" value="${teacher.subject}" placeholder="Enter Subject" style="margin:0;" />
+        <select id="swal-subject" class="swal2-input" style="margin: 0; color: #212529;">
+          <option value="" disabled hidden>Select Subject</option>
+          ${subjectOptions}
+        </select>
       </div>
     `,
     showCancelButton: true,
     confirmButtonText: 'Update',
     focusConfirm: false,
     didOpen: () => {
-      const teacherSelect = document.getElementById('swal-teacher');
-      teacherSelect.addEventListener('change', function () {
+      document.getElementById('swal-teacher').addEventListener('change', function () {
+        this.style.color = this.value === '' ? '#6c757d' : '#212529';
+      });
+      document.getElementById('swal-subject').addEventListener('change', function () {
         this.style.color = this.value === '' ? '#6c757d' : '#212529';
       });
     },
     preConfirm: () => {
       const teacherId = document.getElementById('swal-teacher').value;
-      const subject = document.getElementById('swal-subject').value.trim();
-
+      const subject = document.getElementById('swal-subject').value;
       if (!teacherId || !subject) {
         Swal.showValidationMessage('All fields are required.');
         return false;
       }
-
-      // 🔎 Conflict check (exclude the current teacher being edited)
-      const exists = subjectTeachers.some(
-        (t) =>
-          t.subject.toLowerCase() === subject.toLowerCase() &&
-          t.id !== teacher.id
-      );
-
-      if (exists) {
-        Swal.showValidationMessage('This subject is already assigned to another teacher.');
-        return false;
-      }
-
       return { teacher_id: teacherId, subject };
     },
   });
@@ -408,18 +471,19 @@ const handleEditTeacher = async (teacher) => {
       await axios.put(`/api/sections/${id}/subject-teachers/${teacher.id}`, formValues, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-      // Refresh teacher list
+
       const updated = await axios.get(`/api/sections/${id}/subject-teachers`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setSubjectTeachers(updated.data);
-      Swal.fire('Updated!', 'Subject teacher updated successfully.', 'success');
+      Swal.fire('Updated!', 'Subject teacher updated and schedule entries updated.', 'success');
     } catch (err) {
       console.error(err);
-      Swal.fire('Error', 'Update failed.', 'error');
+      Swal.fire('Error', err.response?.data?.error || 'Update failed.', 'error');
     }
   }
 };
+
 
 
 
@@ -458,6 +522,8 @@ const handleRemoveTeacher = async (teacherId) => {
         <div className="mb-3 d-flex gap-2 flex-wrap">
           <button className="btn btn-link text-success fw-bold text-uppercase d-flex align-items-center gap-1 p-0 text-decoration-none" onClick={handleAssignTeacher}><i className="bi bi-person-plus"></i> Add Subject Teacher</button>
           <button className="btn btn-link text-success fw-bold text-uppercase d-flex align-items-center gap-1 p-0 text-decoration-none" onClick={handleAddStudent}><i className="bi bi-person-plus"></i> Add Student</button>
+      
+
         </div>
 
         <ul className="nav nav-tabs mb-3">

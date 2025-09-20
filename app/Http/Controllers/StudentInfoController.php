@@ -16,75 +16,7 @@ class StudentInfoController extends Controller
         $students = Student::with('user')->get(); // assumes Student belongsTo User
         return response()->json($students);
     }
-    // public function update(Request $request, $id)
-    // {
-    //     $request->validate([
-    //         'first_name' => 'required|string',
-    //         'last_name' => 'required|string',
-    //         'gender' => 'required|string',
-    //         'birth_date' => 'required|date',
-    //         'age' => 'required|integer',
-    //         'nationality' => 'required|string',
-    //         'religion' => 'required|string',
-    //         'home_address' => 'required|string',
-    //         'contact_number' => 'required|string',
-    //         'is_4ps' => 'required|boolean',
-    //         'emergency_contact_name' => 'required|string',
-    //         'emergency_relationship' => 'required|string',
-    //         'emergency_phone' => 'required|string',
-    //         'emergency_address' => 'required|string',
-    //         'password' => 'required|string|min:6|confirmed'
-    //     ]);
-
-    //     $user = User::findOrFail($id);
-    //     $user->password = Hash::make($request->password);
-    //     $user->must_reset_password = false;
-    //     $fullName = $request->first_name . ' ' . $request->middle_name . ' ' . $request->last_name;
-    //     $user->name = trim($fullName);
-    //     $user->save();
-
-    //     Student::updateOrCreate(
-    //         ['user_id' => $id],
-    //         $request->except(['password', 'password_confirmation']) + ['user_id' => $id]
-    //     );
-
-    //     return response()->json(['message' => 'Student info updated successfully']);
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $user = User::findOrFail($id);
-
-    //     // Validate incoming request
-    //     $validated = $request->validate([
-    //         'name' => 'required|string',
-    //         'email' => 'required|email',
-    //         'student.gender' => 'required|string|in:male,female',
-    //         'student.age' => 'required|integer',
-    //         'student.address' => 'required|string',
-    //         'student.contact_number' => 'required|string',
-    //         'student.emergency_contact' => 'required|string',
-    //     ]);
-
-    //     // Update user basic info
-    //     $user->update([
-    //         'name' => $request->name,
-    //         'email' => $request->email,
-    //     ]);
-
-    //     // Update related student info (assuming user hasOne Student)
-    //     if ($user->student) {
-    //         $user->student->update([
-    //             'gender' => $request->student['gender'],
-    //             'age' => $request->student['age'],
-    //             'home_address' => $request->student['address'],
-    //             'contact_number' => $request->student['contact_number'],
-    //             'emergency_phone' => $request->student['emergency_contact'],
-    //         ]);
-    //     }
-
-    //     return response()->json(['message' => 'Student updated successfully']);
-    // }
+   
 
     public function update(Request $request, $id)
     {

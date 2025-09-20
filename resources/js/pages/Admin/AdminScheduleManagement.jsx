@@ -71,53 +71,7 @@ export default function AdminScheduleManagement() {
     currentPage * itemsPerPage
   );
 
-  // const handleEditSchedule = async (id, currentSectionId) => {
-  //   const sectionOptionsHtml = sections
-  //     .map(
-  //       (s) => `
-  //         <option value="${s.id}" ${s.id === currentSectionId ? 'selected' : ''}>
-  //           ${s.section_name} – Grade ${s.grade_level} (${s.strand})
-  //         </option>
-  //       `
-  //     )
-  //     .join('');
-
-  //   const { value: selected } = await Swal.fire({
-  //     title: 'Edit Class Schedule',
-  //     html: `
-  //       <div class="d-flex flex-column gap-2">
-  //         <label for="swal-edit-section" class="form-label">Select Section</label>
-  //         <select id="swal-edit-section" class="swal2-select" style="margin: 0; color: #212529;">
-  //           ${sectionOptionsHtml}
-  //         </select>
-  //       </div>
-  //     `,
-  //     showCancelButton: true,
-  //     confirmButtonText: 'Update',
-  //     cancelButtonText: 'Cancel',
-  //     focusConfirm: false,
-  //     preConfirm: () => {
-  //       const section = document.getElementById('swal-edit-section').value;
-  //       if (!section) {
-  //         Swal.showValidationMessage('Please select a section');
-  //       }
-  //       return section;
-  //     },
-  //   });
-
-  //   if (selected) {
-  //     try {
-  //       await axios.put(`http://shs-portal.test/api/schedules/${id}`, {
-  //         section_id: selected,
-  //       });
-  //       fetchSchedules();
-  //       Swal.fire('Updated!', 'Schedule updated successfully.', 'success');
-  //     } catch (err) {
-  //       Swal.fire('Error', err.response?.data?.message || 'Failed to update schedule.', 'error');
-  //     }
-  //   }
-  // };
-
+ 
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: 'Are you sure?',

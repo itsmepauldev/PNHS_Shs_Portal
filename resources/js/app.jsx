@@ -29,7 +29,9 @@ import MyViolations  from './pages/Students/MyViolations';
 import StudentDocuments from './pages/Students/StudentDocuments';
 import AdviserSection from './pages/Adviser/AdviserSections';
 import StudentGrades from './pages/Students/StudentGrades';
-
+import Announcement from './pages/Admin/Announcement'
+import GuidanceAnnouncement from './pages/Guidance/GuidanceAnnouncement';
+import GuidanceViolation from './pages/Guidance/GuidanceViolationManagement';
 // Attach token on reload
 const token = localStorage.getItem('token');
 if (token) {
@@ -155,6 +157,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 <Route path="/student/documents" element={<StudentDocuments />} />
 <Route path="/adviser/MySection" element={<AdviserSection />} />
 <Route path="/student/grades" element={<StudentGrades />} />
+
+<Route path="/Announcements" element={<Announcement />} />
+<Route path="/guidance/announcement" element={<GuidanceAnnouncement />} />
+<Route path="/guidance/violation" element={<GuidanceViolation />} />
     </Routes>
 
 

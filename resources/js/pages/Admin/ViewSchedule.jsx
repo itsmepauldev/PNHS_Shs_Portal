@@ -21,6 +21,14 @@ export default function ViewSchedule() {
     room: '',
     teacher_id: '',
   });
+const [rooms, setRooms] = useState([
+  'A101','A102','A103','A104',
+  'A202' ,'A202','A203','A204',
+  'B101','B102','B103',  
+  'B201','B202','B203',  
+  'B301','B302','B303',  
+  'C101','C102','C103','A104',
+]);
 
   const [teachers, setTeachers] = useState([]);
 const [subjectTeachers, setSubjectTeachers] = useState([]);
@@ -77,66 +85,67 @@ const handleEdit = async (entry) => {
   const dayOptions = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
     .map(day => `<option value="${day}" ${entry.day === day ? 'selected' : ''}>${day}</option>`)
     .join('');
+const roomOptions = rooms
+  .map(room => `<option value="${room}" ${entry.room === room ? 'selected' : ''}>${room}</option>`)
+  .join('');
+ const { value: formValues } = await Swal.fire({
+  title: 'Edit Schedule Entry',
+  html:
+    '<div class="d-flex flex-column gap-2">' +
+    `<select id="subject" class="swal2-input" style="margin: 0;" onchange="window.updateTeacherName(this.value)">` +
+      `<option value="" disabled hidden>Select Subject</option>` +
+      subjectOptions +
+    `</select>` +
+    `<input id="teacher_name" class="swal2-input" placeholder="Teacher" value="${
+      subjectTeachers.find(st => st.subject === entry.subject)?.teacher_name || ''
+    }" readonly style="margin: 0; background-color: #f1f1f1;" />` +
+    `<select id="day" class="swal2-input" style="margin: 0;">` +
+      `<option value="" disabled hidden ${!entry.day ? 'selected' : ''}>Select Day</option>` +
+      dayOptions +
+    `</select>` +
+    `<input id="start_time" type="time" class="swal2-input" value="${entry.start_time?.slice(0,5) || ''}" style="margin: 0;" />` +
+    `<input id="end_time" type="time" class="swal2-input" value="${entry.end_time?.slice(0,5) || ''}" style="margin: 0;" />` +
+    // ✅ Room dropdown instead of input
+    `<select id="room" class="swal2-input" style="margin: 0;">
+        <option value="" disabled hidden>Select Room</option>
+        ${roomOptions}
+     </select>` +
+    '</div>',
+  showCancelButton: true,
+  confirmButtonText: 'Update',
+  cancelButtonText: 'Cancel',
+  focusConfirm: false,
+  didOpen: () => {
+    window.updateTeacherName = (subject) => {
+      const teacherField = document.getElementById('teacher_name');
+      const selected = subjectTeachers.find(st => st.subject === subject);
+      teacherField.value = selected ? selected.teacher_name : '';
+    };
+  },
+  preConfirm: () => {
+    const subject = document.getElementById('subject').value.trim();
+    const teacher_id = subjectTeachers.find(st => st.subject === subject)?.teacher_id || '';
+    const day = document.getElementById('day').value.trim();
+    const start_time = document.getElementById('start_time').value.trim();
+    const end_time = document.getElementById('end_time').value.trim();
+    const room = document.getElementById('room').value.trim(); // ✅ get selected room
 
-  const { value: formValues } = await Swal.fire({
-    title: 'Edit Schedule Entry',
-    html:
-      '<div class="d-flex flex-column gap-2">' +
-      // ✅ Subject dropdown (filtered like add form)
-      `<select id="subject" class="swal2-input" style="margin: 0;" onchange="window.updateTeacherName(this.value)">` +
-        `<option value="" disabled hidden>Select Subject</option>` +
-        subjectOptions +
-      `</select>` +
+    if (!subject || !teacher_id || !day || !start_time || !end_time || !room) {
+      Swal.showValidationMessage('All fields are required');
+      return false;
+    }
 
-      // ✅ Teacher auto-filled (readonly)
-      `<input id="teacher_name" class="swal2-input" placeholder="Teacher" value="${
-        subjectTeachers.find(st => st.subject === entry.subject)?.teacher_name || ''
-      }" readonly style="margin: 0; background-color: #f1f1f1;" />` +
-
-      `<select id="day" class="swal2-input" style="margin: 0;">` +
-        `<option value="" disabled hidden ${!entry.day ? 'selected' : ''}>Select Day</option>` +
-        dayOptions +
-      `</select>` +
-      `<input id="start_time" type="time" class="swal2-input" value="${entry.start_time?.slice(0,5) || ''}" style="margin: 0;" />` +
-      `<input id="end_time" type="time" class="swal2-input" value="${entry.end_time?.slice(0,5) || ''}" style="margin: 0;" />` +
-      `<input id="room" class="swal2-input" placeholder="Room" value="${entry.room || ''}" style="margin: 0;" />` +
-      '</div>',
-    showCancelButton: true,
-    confirmButtonText: 'Update',
-    cancelButtonText: 'Cancel',
-    focusConfirm: false,
-    didOpen: () => {
-      // ✅ Function to update teacher name automatically when subject changes
-      window.updateTeacherName = (subject) => {
-        const teacherField = document.getElementById('teacher_name');
-        const selected = subjectTeachers.find(st => st.subject === subject);
-        teacherField.value = selected ? selected.teacher_name : '';
-      };
-    },
-    preConfirm: () => {
-      const subject = document.getElementById('subject').value.trim();
-      const teacher_id = subjectTeachers.find(st => st.subject === subject)?.teacher_id || '';
-      const day = document.getElementById('day').value.trim();
-      const start_time = document.getElementById('start_time').value.trim();
-      const end_time = document.getElementById('end_time').value.trim();
-      const room = document.getElementById('room').value.trim();
-
-      if (!subject || !teacher_id || !day || !start_time || !end_time || !room) {
-        Swal.showValidationMessage('All fields are required');
-        return false;
-      }
-
-      return {
-        subject,
-        teacher_id,
-        day,
-        start_time,
-        end_time,
-        room,
-        schedule_id: entry.schedule_id,
-      };
-    },
-  });
+    return {
+      subject,
+      teacher_id,
+      day,
+      start_time,
+      end_time,
+      room,
+      schedule_id: entry.schedule_id,
+    };
+  },
+});
 
   if (formValues) {
     try {
@@ -282,17 +291,22 @@ const handleEdit = async (entry) => {
               />
             </div>
 
-            <div className="col-md-2">
-              <label className="form-label">Room</label>
-              <input
-                type="text"
-                className="form-control"
-                name="room"
-                value={formData.room}
-                onChange={handleChange}
-                required
-              />
-            </div>
+           <div className="col-md-2">
+  <label className="form-label">Room</label>
+  <select
+    className="form-select"
+    name="room"
+    value={formData.room}
+    onChange={handleChange}
+    required
+  >
+    <option value="">Select Room</option>
+    {rooms.map((r) => (
+      <option key={r} value={r}>{r}</option>
+    ))}
+  </select>
+</div>
+
 
            <div className="col-md-3">
   <label className="form-label">Teacher</label>

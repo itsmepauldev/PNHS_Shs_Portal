@@ -15,16 +15,7 @@ class ViolationController extends Controller
         return response()->json($violations);
     }
 
-    // Fetch all students with role 'student'
-    // public function getStudents()
-    // {
-    //     $students = User::where('role', 'student')
-    //         ->select('id', 'name')
-    //         ->orderBy('name', 'asc')
-    //         ->get();
-
-    //     return response()->json($students);
-    // }
+  
 
     // Store new violation
     public function store(Request $request)

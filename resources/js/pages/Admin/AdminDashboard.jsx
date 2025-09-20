@@ -53,6 +53,7 @@ export default function AdminDashboard() {
         '<option value="teacher">Teacher</option>' +
         '<option value="adviser">Adviser</option>' +
         '<option value="student">Student</option>' +
+         '<option value="guidance">Guidance</option>' +
         '</select>' +
         '<input id="swal-name" class="swal2-input" placeholder="Name" style="margin: 0;" />' +
         '<input id="swal-email" class="swal2-input" placeholder="Email" style="margin: 0;" />' +
@@ -105,6 +106,7 @@ export default function AdminDashboard() {
         `<option value="teacher" ${user.role === 'teacher' ? 'selected' : ''}>Teacher</option>` +
         `<option value="adviser" ${user.role === 'adviser' ? 'selected' : ''}>Adviser</option>` +
         `<option value="student" ${user.role === 'student' ? 'selected' : ''}>Student</option>` +
+         `<option value="guidance" ${user.role === 'guidance' ? 'selected' : ''}>Guidance</option>` +
         '</select>' +
         `<input id="swal-name" class="swal2-input" value="${user.name}" placeholder="Name" style="margin: 0;" />` +
         `<input id="swal-email" class="swal2-input" value="${user.email}" placeholder="Email" style="margin: 0;" />` +
@@ -256,9 +258,9 @@ export default function AdminDashboard() {
     <div className="card shadow-sm border-0">
       <div className="card-body text-center">
         <h5 className="fw-bold text-secondary text-dark">
-          <i className="bi bi-person-badge-fill me-2 text-dark fw-bold"></i> Document Requests
+          <i className="bi bi-person-badge-fill me-2 text-dark fw-bold"></i> Guidance
         </h5>
-        <p className="fs-3 text-danger fw-bold">0</p>
+       <p className="fs-3 text-danger fw-bold">{countByRole('guidance')}</p>
       </div>
     </div>
   </div>
@@ -286,6 +288,7 @@ export default function AdminDashboard() {
               <option value="student">Student</option>
               <option value="teacher">Teacher</option>
               <option value="adviser">Adviser</option>
+              <option value="guidance">Guidance</option>
               <option value="admin">Admin</option>
             </select>
           </div>

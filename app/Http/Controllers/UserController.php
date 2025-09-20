@@ -29,7 +29,9 @@ class UserController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
-                'role' => 'required|in:admin,teacher,adviser,student',
+                // 'role' => 'required|in:admin,teacher,adviser,student',
+                'role' => 'required|in:admin,teacher,student,adviser,guidance',
+
             ]);
 
             // Set default password for teacher/student, use input password for admin
@@ -73,7 +75,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
-            'role' => 'required|string|in:admin,adviser,teacher,student',
+            'role' => 'required|string|in:admin,adviser,teacher,student,guidance',
             'password' => $request->filled('password') ? 'nullable|string|min:8' : '',
         ]);
 
@@ -110,15 +112,7 @@ class UserController extends Controller
             return response()->json(['error' => 'Delete failed'], 500);
         }
     }
-    // public function getStudents($id)
-    // {
-    //     $students = User::with('student')
-    //         ->where('role', 'student')
-    //         ->where('section_id', $id)
-    //         ->get();
 
-    //     return response()->json($students);
-    // }
 
 
 }

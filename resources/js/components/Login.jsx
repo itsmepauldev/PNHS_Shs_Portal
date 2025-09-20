@@ -24,18 +24,34 @@ export default function Login() {
       localStorage.setItem('user', JSON.stringify(user));
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
-      if (user.role === 'admin') {
+//       if (user.role === 'admin') {
+//   navigate('/admin/dashboard');
+// }else if (user.must_reset_password) {
+//   if (user.role === 'student') navigate('/student/info');
+//   else if (user.role === 'teacher') navigate('/teacher/info');
+//   else if (user.role === 'adviser') navigate('/teacher/info');
+// } else if (user.role === 'teacher') {
+//   navigate('/teacher/home');
+// } else if (user.role === 'adviser') {
+//   navigate('/adviser/home');
+// } else if (user.role === 'student') {
+//   navigate('/student/home');
+// }
+if (user.role === 'admin') {
   navigate('/admin/dashboard');
-}else if (user.must_reset_password) {
+} else if (user.must_reset_password) {
   if (user.role === 'student') navigate('/student/info');
   else if (user.role === 'teacher') navigate('/teacher/info');
   else if (user.role === 'adviser') navigate('/teacher/info');
+  else if (user.role === 'guidance') navigate("/guidance/announcement"); // NEW reset path
 } else if (user.role === 'teacher') {
   navigate('/teacher/home');
 } else if (user.role === 'adviser') {
   navigate('/adviser/home');
 } else if (user.role === 'student') {
   navigate('/student/home');
+} else if (user.role === 'guidance') {
+  navigate("/guidance/announcement"); // NEW main path
 }
 
 
@@ -44,21 +60,42 @@ export default function Login() {
     }
   };
 
- useEffect(() => {
+//  useEffect(() => {
+//   const user = JSON.parse(localStorage.getItem('user'));
+//   if (user) {
+//     if (user.role === 'admin') navigate('/admin/dashboard');
+//     // else if ((user.role === 'teacher' || user.role === 'student' || user.role === 'adviser') && user.must_reset_password) {
+//     //   navigate('/reset-password');} 
+//       else if (user.must_reset_password) {
+//   if (user.role === 'student') navigate('/student/info');
+//   else if (user.role === 'teacher') navigate('/teacher/info');
+//   else if (user.role === 'adviser') navigate('/teacher/info');
+
+// } 
+//       else if (user.role === 'teacher') navigate('/teacher/home');
+//     else if (user.role === 'adviser') navigate('/adviser/home');
+//     else if (user.role === 'student') navigate('/student/home');
+//   }
+// }, [location]);
+useEffect(() => {
   const user = JSON.parse(localStorage.getItem('user'));
   if (user) {
-    if (user.role === 'admin') navigate('/admin/dashboard');
-    // else if ((user.role === 'teacher' || user.role === 'student' || user.role === 'adviser') && user.must_reset_password) {
-    //   navigate('/reset-password');} 
-      else if (user.must_reset_password) {
-  if (user.role === 'student') navigate('/student/info');
-  else if (user.role === 'teacher') navigate('/teacher/info');
-  else if (user.role === 'adviser') navigate('/teacher/info');
-
-} 
-      else if (user.role === 'teacher') navigate('/teacher/home');
-    else if (user.role === 'adviser') navigate('/adviser/home');
-    else if (user.role === 'student') navigate('/student/home');
+    if (user.role === 'admin') {
+      navigate('/admin/dashboard');
+    } else if (user.must_reset_password) {
+      if (user.role === 'student') navigate('/student/info');
+      else if (user.role === 'teacher') navigate('/teacher/info');
+      else if (user.role === 'adviser') navigate('/teacher/info');
+      else if (user.role === 'guidance') navigate("/guidance/announcement"); // NEW reset path
+    } else if (user.role === 'teacher') {
+      navigate('/teacher/home');
+    } else if (user.role === 'adviser') {
+      navigate('/adviser/home');
+    } else if (user.role === 'student') {
+      navigate('/student/home');
+    } else if (user.role === 'guidance') {
+      navigate("/guidance/announcement"); // NEW main path
+    }
   }
 }, [location]);
 

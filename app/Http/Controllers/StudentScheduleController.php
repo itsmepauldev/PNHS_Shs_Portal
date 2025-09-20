@@ -40,9 +40,7 @@ class StudentScheduleController extends Controller
             return response()->json(['message' => 'No section assigned'], 404);
         }
 
-        // $schedule = Schedule::with('section')
-        //     ->where('section_id', $student->section_id)
-        //     ->get();
+        
         $schedule = Schedule::with(['section', 'entries.teacher',]) // include entries
             ->where('section_id', $student->section_id)
             ->get();

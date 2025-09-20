@@ -124,7 +124,7 @@ export default function AdviserTeacher() {
             </div>
           </div>
 
-          <h5 className="text-primary mt-4 mb-3">Reset Password</h5>
+          <h5 className="text-primary mt-4 mb-3">Set Password</h5>
           <div className="row g-3">
             <div className="col-md-6">
               <label>New Password</label>
