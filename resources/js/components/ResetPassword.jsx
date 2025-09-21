@@ -19,8 +19,8 @@ export default function ResetPassword() {
 
     // ✅ Redirect based on role
     if (user.role === 'admin') navigate('/admin/dashboard');
-    else if (user.role === 'teacher') navigate('/teacher/home');
-    else if (user.role === 'adviser') navigate('/adviser/home');
+    else if (user.role === 'teacher') navigate('/teacher/announcement');
+    else if (user.role === 'adviser') navigate('/adviser/announcement');
     else if (user.role === 'student') navigate('/student/home');
   } catch (err) {
     Swal.fire('Error', 'Failed to reset password.', 'error');

@@ -7,8 +7,8 @@ export default function TeacherSidebar({ collapsed, setCollapsed }) {
 
   // Highlight Dashboard if on home or any manage grades page
   const isActive = (path) => {
-    if (path === '/teacher/home') {
-      return location.pathname === '/teacher/home' || location.pathname.startsWith('/teacher/section');
+    if (path === '/teacher/announcement') {
+      return location.pathname === '/teacher/announcement' || location.pathname.startsWith('/teacher/section');
     }
     return location.pathname === path;
   };
@@ -36,11 +36,11 @@ export default function TeacherSidebar({ collapsed, setCollapsed }) {
         <li className="nav-item">
           <button
             className={`nav-link btn btn-link text-start w-100 ${
-              isActive('/teacher/home')
+              isActive('/teacher/announcement')
                 ? 'bg-primary text-white fw-bold'
                 : 'text-white'
             }`}
-            onClick={() => handleNavigation('/teacher/home')}
+            onClick={() => handleNavigation('/teacher/announcement')}
           >
             Dashboard
           </button>

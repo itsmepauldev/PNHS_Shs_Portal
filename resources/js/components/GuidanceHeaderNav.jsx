@@ -49,7 +49,18 @@ export default function GuidanceHeaderNav() {
               Announcement
             </button>
           </li>
-
+  <li className="nav-item">
+            <button
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/guidance/violationrequest")
+                  ? "fw-bold text-light"
+                  : "text-white-50"
+              }`}
+              onClick={() => handleNavigation("/guidance/violationrequest")}
+            >
+              Violation Request
+            </button>
+          </li>
           {/* Violation */}
           <li className="nav-item">
             <button

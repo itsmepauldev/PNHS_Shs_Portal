@@ -257,3 +257,16 @@ Route::delete('/sections/{id}/subject-teachers/{teacher}', [SectionController::c
 
 
 
+use App\Http\Controllers\ViolationRequestController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    // Teacher/Adviser
+    Route::post('/violation-requests', [ViolationRequestController::class, 'store']);
+    Route::get('/violation-requests/my', [ViolationRequestController::class, 'myRequests']);
+
+    // Guidance
+    Route::get('/violation-requests', [ViolationRequestController::class, 'index']);
+    Route::put('/violation-requests/{id}/reviewed', [ViolationRequestController::class, 'markReviewed']);
+});
+
+Route::put('/violation-requests/{id}/declined', [ViolationRequestController::class, 'decline']);

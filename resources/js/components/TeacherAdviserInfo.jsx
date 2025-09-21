@@ -51,7 +51,7 @@ export default function AdviserTeacher() {
       const updatedUser = { ...user, must_reset_password: false };
       localStorage.setItem('user', JSON.stringify(updatedUser));
 
-      navigate(user.role === 'adviser' ? '/adviser/home' : '/teacher/home');
+      navigate(user.role === 'adviser' ? '/adviser/announcement' : '/teacher/announcement');
     } catch (error) {
       console.error(error);
       setMessage('Failed to submit. Please check your input.');

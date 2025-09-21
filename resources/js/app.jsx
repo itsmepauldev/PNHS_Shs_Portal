@@ -4,10 +4,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import Login from './components/Login';
 import AdminDashboard from './pages/Admin/AdminDashboard';
-import TeacherHome from './pages/Teacher/TeacherHome';
+import TeacherAnnouncement from './pages/Teacher/TeacherAnnouncement';
+import GuidanceViolationRequest from './pages/Guidance/GuidanceViolationRequest';
+import ViolationReport from './pages/Teacher/ViolationReport';
 import StudentHome from './pages/Students/StudentHome';
 import ResetPassword from './components/ResetPassword';
-import AdviserHome from './pages/Adviser/AdviserHome';
+import AdviserAnnouncement from './pages/Adviser/AdviserAnnouncement';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './components/AdminLayout';
 import SectionManagement from './pages/Admin/SectionManagement';
@@ -21,7 +23,7 @@ import StudentInfo from './components/StudentInfo';
 import AdviserTeacherInfo from './components/TeacherAdviserInfo';
 import AdminScheduleManagement from './pages/Admin/AdminScheduleManagement'; // or correct path
 import ViewSchedule from './pages/Admin/ViewSchedule'; // or correct path
-
+import AdviserViolationReport from './pages/Adviser/AdviserViolationReport';
 import MySchedule from './pages/Teacher/MySchedule'; // adjust the path if needed
 import AdviserMySchedule  from './pages/Adviser/AdviserMySchedule';
 import StudentSchedule  from './pages/Students/StudentSchedule';
@@ -32,6 +34,7 @@ import StudentGrades from './pages/Students/StudentGrades';
 import Announcement from './pages/Admin/Announcement'
 import GuidanceAnnouncement from './pages/Guidance/GuidanceAnnouncement';
 import GuidanceViolation from './pages/Guidance/GuidanceViolationManagement';
+import MySubject from './pages/Teacher/MySubject';
 // Attach token on reload
 const token = localStorage.getItem('token');
 if (token) {
@@ -55,10 +58,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       />
 
       <Route
-        path="/teacher/home"
+        path="/teacher/announcement"
         element={
           <ProtectedRoute role="teacher">
-            <TeacherHome />
+            <TeacherAnnouncement />
           </ProtectedRoute>
         }
       />
@@ -113,10 +116,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/adviser" element={  <ProtectedRoute role="adviser">
-      <AdviserHome />
+      <AdviserAnnouncement />
     </ProtectedRoute>} />
-       <Route path="/adviser/home" element={  <ProtectedRoute role="adviser">
-      <AdviserHome />
+       <Route path="/adviser/announcement" element={  <ProtectedRoute role="adviser">
+      <AdviserAnnouncement />
     </ProtectedRoute>} />
       <Route path="/adviser/section/:id" element={  <ProtectedRoute role="adviser">
      <AdviserManageSection />
@@ -142,7 +145,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 
 <Route path="/teacher/schedule" element={<MySchedule />} />
+<Route path="/teacher/violationreport" element={<ViolationReport />} />
+<Route path="/teacher/mysubject" element={<MySubject />} />
 <Route path="/adviser/my-schedule" element={<AdviserMySchedule />} />
+<Route path="/adviser/violationreport" element={<AdviserViolationReport/>} />
   <Route path="/my-schedule" element={<StudentSchedule />} />
 
 
@@ -161,6 +167,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 <Route path="/Announcements" element={<Announcement />} />
 <Route path="/guidance/announcement" element={<GuidanceAnnouncement />} />
 <Route path="/guidance/violation" element={<GuidanceViolation />} />
+<Route path="/guidance/violationrequest" element={<GuidanceViolationRequest />} />
     </Routes>
 
 

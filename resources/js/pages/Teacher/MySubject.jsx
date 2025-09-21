@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TeacherLayout from '../../components/TeacherLayout';
 
-export default function TeacherHome() {
+export default function MySubject() {
   const navigate = useNavigate();
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [subjects, setSubjects] = useState([]);
@@ -66,8 +66,8 @@ export default function TeacherHome() {
     <TeacherLayout>
        <div style={{ backgroundColor: "#f3f3f3", minHeight: "100vh" }}>
         <div className="container-fluid p-3" style={{ backgroundColor: "#f3f3f3" }}>
-      <h2 className="mb-3 fw-bold text-danger">Welcome, {user?.name || 'Teacher'}!</h2>
-      <p className="lead text-muted">This is your Teacher dashboard.</p>
+      {/* <h2 className="mb-3 fw-bold text-danger">Welcome, {user?.name || 'Teacher'}!</h2>
+      <p className="lead text-muted">This is your Teacher dashboard.</p> */}
 
       <div className="mt-4">
         <h4 className="mb-3 fw-bold text-danger">Assigned Subjects</h4>

@@ -17,13 +17,17 @@ export default function ViolationManagement() {
   });
   const [selectedViolationType, setSelectedViolationType] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  
+const [currentPage, setCurrentPage] = useState(1);
+const violationsPerPage = 10; // or any number you prefer
+
 
   // 🔎 Table filter states
   const [filterStudent, setFilterStudent] = useState("");
   const [filterViolation, setFilterViolation] = useState("");
   const [filterOffense, setFilterOffense] = useState("");
 const [filterViolationType, setFilterViolationType] = useState(null);
+const [filterStartDate, setFilterStartDate] = useState("");
+const [filterEndDate, setFilterEndDate] = useState("");
 
   const violationTypeOptions = [
     {
@@ -258,13 +262,31 @@ const [filterViolationType, setFilterViolationType] = useState(null);
   };
 
   // ✅ Apply filters to table data
- const filteredViolations = violations.filter((v) => {
+const filteredViolations = violations.filter((v) => {
+  const violationDate = new Date(v.created_at).toISOString().split("T")[0]; // YYYY-MM-DD
+
+  // check if violation date is within range
+  const isWithinDateRange =
+    (!filterStartDate || violationDate >= filterStartDate) &&
+    (!filterEndDate || violationDate <= filterEndDate);
+
   return (
     (filterStudent ? v.student?.name?.toLowerCase().includes(filterStudent.toLowerCase()) : true) &&
     (filterViolationType ? v.violation_type === filterViolationType.value : true) &&
-    (filterOffense ? v.offense_level === filterOffense : true)
+    (filterOffense ? v.offense_level === filterOffense : true) &&
+    isWithinDateRange
   );
 });
+
+const indexOfLastViolation = currentPage * violationsPerPage;
+const indexOfFirstViolation = indexOfLastViolation - violationsPerPage;
+const currentViolations = filteredViolations.slice(
+  indexOfFirstViolation,
+  indexOfLastViolation
+);
+const totalPages = Math.ceil(filteredViolations.length / violationsPerPage);
+
+const changePage = (pageNumber) => setCurrentPage(pageNumber);
 
 
   return (
@@ -372,59 +394,106 @@ const [filterViolationType, setFilterViolationType] = useState(null);
                 <option value="3rd Warning">3rd Warning</option>
               </select>
             </div>
+            <div className="col-md-4">
+  <input
+    type="date"
+    className="form-control"
+    placeholder="Start Date"
+    value={filterStartDate}
+    onChange={(e) => setFilterStartDate(e.target.value)}
+  />
+</div>
+
+<div className="col-md-4">
+  <input
+    type="date"
+    className="form-control"
+    placeholder="End Date"
+    value={filterEndDate}
+    onChange={(e) => setFilterEndDate(e.target.value)}
+  />
+</div>
+
           </div>
           {/* ✅ Table Section */}
           <div className="table-responsive">
             <table className="table table-bordered table-hover bg-white">
               <thead className="table-danger">
                 <tr>
+                  <th>#</th>
                   <th>Student</th>
                   <th>Violation Type</th>
                   <th>Offense Level</th>
                   <th>Description</th>
+                  <th>Date</th>
                   <th className="text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                {filteredViolations.length > 0 ? (
-                  filteredViolations.map((v) => (
-                    <tr
-                      key={v.id}
-                      className={v.offense_level === "3rd Warning" ? "table-danger" : ""}
-                    >
-                      <td>{v.student?.name}</td>
-                      <td>{v.violation_type}</td>
-                      <td>{v.offense_level}</td>
-                      <td>{v.description}</td>
-                      <td className="text-center">
-                        <div className="d-flex flex-wrap gap-1 justify-content-center">
-                          <button
-                            onClick={() => handleEdit(v)}
-                            className="btn btn-sm d-flex align-items-center gap-1 text-primary fw-bold text-uppercase"
-                            style={{ background: "transparent", border: "none" }}
-                          >
-                            <i className="bi bi-pencil-square"></i> Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(v.id)}
-                            className="btn btn-sm d-flex align-items-center gap-1 text-danger fw-bold text-uppercase"
-                            style={{ background: "transparent", border: "none" }}
-                          >
-                            <i className="bi bi-trash"></i> Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="text-center">
-                      No violations found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
+             <tbody>
+  {currentViolations.length > 0 ? (
+    currentViolations.map((v, index) => (
+      <tr
+        key={v.id}
+        className={v.offense_level === "3rd Warning" ? "table-danger" : ""}
+      >
+        <td>{indexOfFirstViolation + index + 1}</td> {/* row number */}
+        <td>{new Date(v.created_at).toLocaleDateString()}</td>
+        <td>{v.student?.name}</td>
+        <td>{v.violation_type}</td>
+        <td>{v.offense_level}</td>
+        <td>{v.description}</td>
+        <td className="text-center">
+          <div className="d-flex flex-wrap gap-1 justify-content-center">
+            <button
+              onClick={() => handleEdit(v)}
+              className="btn btn-sm d-flex align-items-center gap-1 text-primary fw-bold text-uppercase"
+              style={{ background: "transparent", border: "none" }}
+            >
+              <i className="bi bi-pencil-square"></i> Edit
+            </button>
+            <button
+              onClick={() => handleDelete(v.id)}
+              className="btn btn-sm d-flex align-items-center gap-1 text-danger fw-bold text-uppercase"
+              style={{ background: "transparent", border: "none" }}
+            >
+              <i className="bi bi-trash"></i> Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="7" className="text-center">
+        No violations found
+      </td>
+    </tr>
+  )}
+</tbody>
+
             </table>
+            {totalPages > 1 && (
+  <div className="d-flex justify-content-center mt-3">
+    <nav>
+      <ul className="pagination mb-0">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <li
+            key={index + 1}
+            className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
+          >
+            <button
+              className="page-link"
+              onClick={() => changePage(index + 1)}
+            >
+              {index + 1}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+)}
+
           </div>
         </div>
       </div>

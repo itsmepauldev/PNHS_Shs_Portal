@@ -15,9 +15,35 @@ class ViolationController extends Controller
         return response()->json($violations);
     }
 
-  
+
 
     // Store new violation
+    // public function store(Request $request)
+    // {
+    //     try {
+    //         $validated = $request->validate([
+    //             'student_id' => 'required|exists:users,id',
+    //             'violation_type' => 'required|string',
+    //             'description' => 'required|string|max:500',
+    //             'offense_level' => 'required|string|in:1st Warning,2nd Warning,3rd Warning',
+    //         ]);
+
+    //         $violation = Violation::create($validated);
+
+    //         return response()->json([
+    //             'message' => 'Violation added successfully',
+    //             'violation' => $violation->load('student')
+    //         ]);
+    //     } catch (\Illuminate\Validation\ValidationException $e) {
+    //         return response()->json([
+    //             'errors' => $e->errors()
+    //         ], 422);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
     public function store(Request $request)
     {
         try {
@@ -25,13 +51,39 @@ class ViolationController extends Controller
                 'student_id' => 'required|exists:users,id',
                 'violation_type' => 'required|string',
                 'description' => 'required|string|max:500',
-                'offense_level' => 'required|string|in:1st Warning,2nd Warning,3rd Warning',
             ]);
 
-            $violation = Violation::create($validated);
+            // Check the student's latest warning
+            $latest = Violation::where('student_id', $validated['student_id'])
+                ->orderBy('id', 'desc') // latest record
+                ->first();
+
+            // Determine next warning
+            if (!$latest) {
+                $nextWarning = "1st Warning";
+            } elseif ($latest->offense_level === "1st Warning") {
+                $nextWarning = "2nd Warning";
+            } elseif ($latest->offense_level === "2nd Warning") {
+                $nextWarning = "3rd Warning";
+            } else {
+                // Already at 3rd Warning → reject request
+                return response()->json([
+                    'status' => 'declined',
+                    'message' => 'This student already has 3rd Warning. No more violations can be recorded.'
+                ], 422);
+            }
+
+            // Create violation with correct warning
+            $violation = Violation::create([
+                'student_id' => $validated['student_id'],
+                'violation_type' => $validated['violation_type'],
+                'description' => $validated['description'],
+                'offense_level' => $nextWarning,
+            ]);
 
             return response()->json([
-                'message' => 'Violation added successfully',
+                'status' => 'approved',
+                'message' => "Violation recorded as {$nextWarning}",
                 'violation' => $violation->load('student')
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {

@@ -7,9 +7,9 @@ export default function AdviserSidebar({ collapsed, setCollapsed }) {
 
   // ✅ Updated isActive function
   const isActive = (path) => {
-    if (path === '/adviser/home') {
+    if (path === '/adviser/announcement') {
       // Highlight Dashboard if on home or any manage section page
-      return location.pathname === '/adviser/home' || location.pathname.startsWith('/adviser/section');
+      return location.pathname === '/adviser/announcement' || location.pathname.startsWith('/adviser/section');
     }
     return location.pathname === path;
   };
@@ -37,13 +37,13 @@ export default function AdviserSidebar({ collapsed, setCollapsed }) {
         <li className="nav-item">
           <button
             className={`nav-link btn btn-link text-start w-100 ${
-              isActive('/adviser/home')
+              isActive('/adviser/announcement')
                 ? 'bg-primary text-white fw-bold'
                 : 'text-white'
             }`}
-            onClick={() => handleNavigation('/adviser/home')}
+            onClick={() => handleNavigation('/adviser/announcement')}
           >
-            Dashboard
+           Announcement
           </button>
         </li>
         <li className="nav-item">

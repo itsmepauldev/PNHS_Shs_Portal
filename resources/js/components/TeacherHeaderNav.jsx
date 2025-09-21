@@ -6,9 +6,9 @@ export default function TeacherHeaderNav() {
   const location = useLocation();
 
   const isActive = (path) => {
-    if (path === "/teacher/home") {
+    if (path === "/teacher/announcement") {
       return (
-        location.pathname === "/teacher/home" ||
+        location.pathname === "/teacher/announcement" ||
         location.pathname.startsWith("/teacher/section")
       );
     }
@@ -47,11 +47,11 @@ export default function TeacherHeaderNav() {
           <li className="nav-item">
             <button
               className={`nav-link btn btn-link px-3 ${
-                isActive("/teacher/home") ? "fw-bold text-light" : "text-white-50"
+                isActive("/teacher/announcement") ? "fw-bold text-light" : "text-white-50"
               }`}
-              onClick={() => handleNavigation("/teacher/home")}
+              onClick={() => handleNavigation("/teacher/announcement")}
             >
-              Dashboard
+              Announcement
             </button>
           </li>
 
@@ -63,6 +63,26 @@ export default function TeacherHeaderNav() {
               onClick={() => handleNavigation("/teacher/schedule")}
             >
               My Schedule
+            </button>
+          </li>
+           <li className="nav-item">
+            <button
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/teacher/mysubject") ? "fw-bold text-light" : "text-white-50"
+              }`}
+              onClick={() => handleNavigation("/teacher/mysubject")}
+            >
+              My Subject
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/teacher/violationreport") ? "fw-bold text-light" : "text-white-50"
+              }`}
+              onClick={() => handleNavigation("/teacher/violationreport")}
+            >
+              Violation Report
             </button>
           </li>
 

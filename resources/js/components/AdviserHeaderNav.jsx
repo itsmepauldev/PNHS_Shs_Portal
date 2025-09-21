@@ -47,11 +47,11 @@ export default function AdviserHeaderNav() {
           <li className="nav-item">
             <button
               className={`nav-link btn btn-link px-3 ${
-                isActive("/adviser/home") ? "fw-bold text-light" : "text-white-50"
+                isActive("/adviser/announcement") ? "fw-bold text-light" : "text-white-50"
               }`}
-              onClick={() => handleNavigation("/adviser/home")}
+              onClick={() => handleNavigation("/adviser/announcement")}
             >
-              Dashboard
+            Announcement
             </button>
           </li>
 
@@ -76,7 +76,16 @@ export default function AdviserHeaderNav() {
               My Schedule
             </button>
           </li>
-
+<li className="nav-item">
+            <button
+              className={`nav-link btn btn-link px-3 ${
+                isActive("/adviser/violationreport") ? "fw-bold text-light" : "text-white-50"
+              }`}
+              onClick={() => handleNavigation("/adviser/violationreport")}
+            >
+              Violation Report
+            </button>
+          </li>
           {/* Logout */}
           <li className="nav-item ms-md-3">
             <button
